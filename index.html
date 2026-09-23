@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daria Feng</title>
+  <meta name="description" content="Daria Feng — personal site, coming soon.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%23c2410c'/><text x='50' y='66' font-size='46' text-anchor='middle' fill='white' font-family='Georgia,serif'>D</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --fg: #1c1917;
+      --muted: #78716c;
+      --accent: #c2410c;
+      --line: #e7e1d8;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141210;
+        --fg: #f5f0e8;
+        --muted: #a8a29e;
+        --accent: #fb923c;
+        --line: #2a2622;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      padding: 0 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+    main {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+      align-self: center;
+      padding: 64px 0;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 10px;
+      vertical-align: middle;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { opacity: .3; } }
+    .eyebrow {
+      font-size: 13px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    h1 {
+      font-family: Fraunces, Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(48px, 11vw, 96px);
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+    h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
+    p.lede {
+      margin-top: 28px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 34ch;
+    }
+    .rule { height: 1px; background: var(--line); margin: 40px 0 24px; }
+    a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      transition: border-color .2s, color .2s;
+    }
+    a:hover { color: var(--accent); border-color: var(--accent); }
+    footer {
+      max-width: 640px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow"><span class="dot"></span>Coming soon</div>
+    <h1>Daria <em>Feng</em></h1>
+    <p class="lede">Something new is taking shape here. Check back soon.</p>
+    <div class="rule"></div>
+  </main>
+  <footer>&copy; <span id="y">2026</span> Daria Feng</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
