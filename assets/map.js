@@ -1,5 +1,5 @@
 /* ==========================================================
-   Sports → Climbing：世界地图 + 钉子
+   Climbing：世界地图 + 钉子
    - 去过的地方自动涂色：有州/省数据的国家（美、中、加、澳、巴西、印度、印尼、俄、南非）按州/省涂，其他按国家涂
    - 点钉子弹出照片 / 视频
    数据在 assets/climbing.js
@@ -13,7 +13,7 @@
   const ATLAS = "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json";
   const ADMIN1 = "assets/geo/admin1.json?v=1"; // 州 / 省边界（Natural Earth 1:50m，已精简）
 
-  const panel = document.querySelector('[data-sub="climbing"]');
+  const panel = document.querySelector('[data-tab="climbing"]');
   const box = document.getElementById("climbMap");
   const statsEl = document.getElementById("climbStats");
   const listEl = document.getElementById("climbList");
@@ -40,7 +40,7 @@
 
   /* ---------- 只在 Climbing 可见时加载 ---------- */
   let started = false;
-  const visible = () => panel.classList.contains("is-active") && panel.closest(".tab").classList.contains("is-active");
+  const visible = () => panel.classList.contains("is-active");
   function check() {
     if (!started && visible()) { started = true; load(); }
   }

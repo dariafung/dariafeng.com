@@ -133,16 +133,8 @@ body.on-dark .top { color: #f3f1ea; }
 .page h2 { font-size: 18px; font-weight: 600; margin: 32px 0 8px; }
 .page ul { padding-left: 1.2em; }
 
-/* 左侧子 tab（Sports 里的 Climbing / Dance）：贴页面最左，和顶部 Logo 对齐，内容占满剩余宽度 */
+/* Climbing 页：全宽，和顶部 Logo 对齐 */
 .page-wide { max-width: none; padding-left: clamp(16px, 4vw, 40px); padding-right: clamp(16px, 4vw, 40px); }
-.subtabs { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 32px; }
-.subnav { display: flex; flex-direction: column; gap: 4px; }
-.subnav a { text-decoration: none; padding: 6px 0; opacity: .5; transition: opacity .2s; }
-.subnav a:hover, .subnav a.is-active { opacity: 1; }
-.subnav a.is-active { font-weight: 600; }
-.subpanel { display: none; }
-.subpanel.is-active { display: block; }
-.subpanel h2:first-child { margin-top: 0; }
 
 /* ---------- Climbing 地图 ---------- */
 /* 户外 = 暖黄，岩馆 = 钴蓝；涂色用淡蓝灰，和两种钉子都搭 */
@@ -151,7 +143,7 @@ body.on-dark .top { color: #f3f1ea; }
 .climb-map {
   position: relative;
   /* 尽量大：宽度占满，高度不超过一屏 */
-  height: min(calc((100vw - 232px) / 2), calc(100svh - 190px));
+  height: min(calc((100vw - 80px) / 2), calc(100svh - 170px));
   min-height: 280px;
   background: #fafafa;
   border: 1px solid #eee; border-radius: 8px;
@@ -236,9 +228,6 @@ body.on-dark .top { color: #f3f1ea; }
   .hint { display: none; }
   .blog-panel { top: auto; height: 55%; width: 100%; padding: 24px 20px; background: #0a0a0a; border-top: 1px solid rgba(255,255,255,.12); transform: translateY(100%); }
   .blog-panel.is-open { transform: none; }
-  /* 手机上子 tab 放到上面，横排 */
-  .subtabs { grid-template-columns: 1fr; gap: 24px; }
-  .subnav { flex-direction: row; gap: 20px; border-bottom: 1px solid #e5e5e5; }
   .climb-map { height: auto; min-height: 0; aspect-ratio: 2 / 1; }
   /* 攀岩列表：地点信息换到名字下面 */
   .climb-list button { grid-template-columns: auto 1fr; row-gap: 2px; }

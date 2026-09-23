@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Daria Feng</title>
-  <meta name="description" content="Daria Feng — student. Blog, career, sports.">
+  <meta name="description" content="Daria Feng — student. Blog, career, climbing.">
   <meta name="theme-color" content="#10243f">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='8' fill='%23545b58'/><text x='50' y='66' font-size='44' text-anchor='middle' fill='%23d8bd7f' font-family='Arial,sans-serif' font-weight='600'>DF</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
   <!-- 每次更新网站时改一下 ?v= 后面的版本号，访客就会拿到新文件，不会用缓存里的旧版 -->
-  <link rel="stylesheet" href="assets/style.css?v=20260923k">
+  <link rel="stylesheet" href="assets/style.css?v=20260923l">
   <script type="importmap">
     { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
@@ -24,7 +24,7 @@
       <a href="#home" data-tab-link="home"><span lang="en">Home</span><span lang="zh">首页</span></a>
       <a href="#blog" data-tab-link="blog"><span lang="en">Blog</span><span lang="zh">博客</span></a>
       <a href="#career" data-tab-link="career"><span lang="en">Career</span><span lang="zh">经历</span></a>
-      <a href="#sports" data-tab-link="sports"><span lang="en">Sports</span><span lang="zh">运动</span></a>
+      <a href="#climbing" data-tab-link="climbing"><span lang="en">Climbing</span><span lang="zh">攀岩</span></a>
     </nav>
     <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">
       <span data-l="en">EN</span> / <span data-l="zh">中</span>
@@ -69,55 +69,36 @@
       <p>…</p>
     </section>
 
-    <!-- ========== Sports ========== -->
-    <section class="tab page page-wide" data-tab="sports">
-      <h1 class="sr-only"><span lang="en">Sports</span><span lang="zh">运动</span></h1>
+    <!-- ========== Climbing ========== -->
+    <section class="tab page page-wide" data-tab="climbing">
+      <h1 class="sr-only"><span lang="en">Climbing</span><span lang="zh">攀岩</span></h1>
+      <p class="climb-stats" id="climbStats"></p>
 
-      <div class="subtabs">
-        <!-- 左侧子 tab；网址是 #sports/climbing 和 #sports/dance -->
-        <nav class="subnav" aria-label="Sports">
-          <a href="#sports/climbing" data-sub-link="climbing"><span lang="en">Climbing</span><span lang="zh">攀岩</span></a>
-          <a href="#sports/dance" data-sub-link="dance"><span lang="en">Dance</span><span lang="zh">舞蹈</span></a>
-        </nav>
-
-        <div class="subpanels">
-          <div class="subpanel" data-sub="climbing">
-            <h2><span lang="en">Climbing</span><span lang="zh">攀岩</span></h2>
-            <p class="climb-stats" id="climbStats"></p>
-
-            <!-- 世界地图：数据在 assets/climbing.js -->
-            <div class="climb-map" id="climbMap">
-              <p class="map-msg"><span lang="en">Loading map…</span><span lang="zh">地图加载中……</span></p>
-            </div>
-            <div class="map-legend">
-              <span><i class="cl-dot cl-outdoor"></i><span lang="en">Outdoor</span><span lang="zh">户外</span></span>
-              <span><i class="cl-dot cl-gym"></i><span lang="en">Gym</span><span lang="zh">岩馆</span></span>
-              <span><i class="cl-swatch"></i><span lang="en">Places I've climbed (state / province)</span><span lang="zh">攀过的地方（州 / 省）</span></span>
-              <span class="map-hint"><span class="desk"><span lang="en">Drag to move · Ctrl + scroll to zoom</span><span lang="zh">拖动平移 · 按住 Ctrl 滚动缩放</span></span><span class="touch"><span lang="en">Pinch to zoom</span><span lang="zh">双指缩放</span></span></span>
-            </div>
-
-            <!-- 地点清单，默认收起 -->
-            <details class="climb-details">
-              <summary><span lang="en">All places</span><span lang="zh">全部地点</span> (<span id="climbCount">0</span>)</summary>
-              <ul class="climb-list" id="climbList"></ul>
-            </details>
-            <dialog class="spot-dialog" id="spotDialog"></dialog>
-          </div>
-
-          <div class="subpanel" data-sub="dance">
-            <h2><span lang="en">Dance</span><span lang="zh">舞蹈</span></h2>
-            <p>…</p>
-          </div>
-        </div>
+      <!-- 世界地图：数据在 assets/climbing.js -->
+      <div class="climb-map" id="climbMap">
+        <p class="map-msg"><span lang="en">Loading map…</span><span lang="zh">地图加载中……</span></p>
       </div>
+      <div class="map-legend">
+        <span><i class="cl-dot cl-outdoor"></i><span lang="en">Outdoor</span><span lang="zh">户外</span></span>
+        <span><i class="cl-dot cl-gym"></i><span lang="en">Gym</span><span lang="zh">岩馆</span></span>
+        <span><i class="cl-swatch"></i><span lang="en">Places I've climbed (state / province)</span><span lang="zh">攀过的地方（州 / 省）</span></span>
+        <span class="map-hint"><span class="desk"><span lang="en">Drag to move · Ctrl + scroll to zoom</span><span lang="zh">拖动平移 · 按住 Ctrl 滚动缩放</span></span><span class="touch"><span lang="en">Pinch to zoom</span><span lang="zh">双指缩放</span></span></span>
+      </div>
+
+      <!-- 地点清单，默认收起 -->
+      <details class="climb-details">
+        <summary><span lang="en">All places</span><span lang="zh">全部地点</span> (<span id="climbCount">0</span>)</summary>
+        <ul class="climb-list" id="climbList"></ul>
+      </details>
+      <dialog class="spot-dialog" id="spotDialog"></dialog>
     </section>
   </main>
 
-  <script src="assets/posts.js?v=20260923k"></script>
-  <script src="assets/main.js?v=20260923k"></script>
-  <script src="assets/blog.js?v=20260923k"></script>
-  <script src="assets/climbing.js?v=20260923k"></script>
-  <script src="assets/map.js?v=20260923k"></script>
-  <script type="module" src="assets/box.js?v=20260923k"></script>
+  <script src="assets/posts.js?v=20260923l"></script>
+  <script src="assets/main.js?v=20260923l"></script>
+  <script src="assets/blog.js?v=20260923l"></script>
+  <script src="assets/climbing.js?v=20260923l"></script>
+  <script src="assets/map.js?v=20260923l"></script>
+  <script type="module" src="assets/box.js?v=20260923l"></script>
 </body>
 </html>
