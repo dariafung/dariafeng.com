@@ -13,13 +13,13 @@ const FACES = {
   bottomRight: [{ text: "Est. 2026", at: "top-left", size: 0.04 }],
 };
 
-const PAPER = "#474f4c";   // 盒子纸张颜色（灰绿）
+const PAPER = "#2e3331";   // 盒子纸张颜色（灰绿）
 const INNER = "#c4bfb2";   // 中间露出的内盒颜色
 const GOLD  = "#e6c98a";   // 烫金字颜色
 const FONT  = '"Inter", "Helvetica Neue", Arial, sans-serif';
 
 // 盒子尺寸（单位随意，保持比例即可）
-const W = 1.0, D = 0.86;
+const W = 0.78, D = 0.78; // 底面接近正方形
 const LID_H = 0.68, BAND_H = 0.05, BOTTOM_H = 0.56;
 
 const canvas = document.getElementById("stage");
