@@ -7,13 +7,9 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 const FACES = {
   lidFront:    [{ text: "Daria Feng", at: "bottom-left", size: 0.055, weight: 600 }],
-  lidRight:    [{ text: "Latest interest", at: "bottom-left", size: 0.04, weight: 600 },
-                { text: "…", at: "bottom-left", size: 0.04, line: 1 }],
   lidBack:     [{ text: "Blog · Career · Sports", at: "bottom-left", size: 0.045, weight: 500 }],
   lidLeft:     [{ text: "dariafeng.com", at: "bottom-left", size: 0.04, weight: 500 }],
   lidTop:      [{ text: "DF", at: "center", size: 0.09, weight: 600 }],
-  bottomFront: [{ text: "Student", at: "top-left", size: 0.042 },
-                { text: "Barre, Swimming & Bouldering", at: "top-left", size: 0.042, line: 1 }],
   bottomRight: [{ text: "Est. 2026", at: "top-left", size: 0.04 }],
 };
 
@@ -201,7 +197,7 @@ function init() {
   // BoxGeometry 的面顺序：右 左 上 下 前 后
   const plain = (w, h) => faceMaterial(w, h);
   const lidMats = [
-    faceMaterial(D, LID_H, FACES.lidRight),
+    plain(D, LID_H),
     faceMaterial(D, LID_H, FACES.lidLeft),
     faceMaterial(W, D, FACES.lidTop),
     plain(W, D),
@@ -213,7 +209,7 @@ function init() {
     plain(D, BOTTOM_H),
     plain(W, D),
     plain(W, D),
-    faceMaterial(W, BOTTOM_H, FACES.bottomFront),
+    plain(W, BOTTOM_H),
     plain(W, BOTTOM_H),
   ];
   const innerMat = faceMaterial(W, BAND_H + 0.1, [], INNER);

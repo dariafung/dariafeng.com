@@ -48,17 +48,7 @@ body.on-home .top { color: #f3f1ea; }
 #stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 #stage.dragging { cursor: grabbing; }
 
-.home-info {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;
-  padding: 24px clamp(16px, 4vw, 40px) 28px;
-  font-size: 14px; line-height: 1.5;
-  pointer-events: none;
-}
-.home-info a { pointer-events: auto; text-underline-offset: 3px; }
-.home-info h1 { font-size: 14px; font-weight: 600; }
-.home-info .label { opacity: .6; }
-.hi-block p { max-width: 36ch; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .hint {
   position: absolute; top: 50%; right: clamp(16px, 4vw, 40px);
@@ -77,6 +67,5 @@ body.on-home .top { color: #f3f1ea; }
 @media (max-width: 640px) {
   .top { flex-wrap: wrap; gap: 8px 16px; }
   .tabs { order: 3; width: 100%; gap: 16px; }
-  .home-info { grid-template-columns: 1fr; gap: 12px; }
   .hint { display: none; }
 }
