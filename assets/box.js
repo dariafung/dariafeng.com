@@ -1,26 +1,21 @@
 /* ==========================================================
-   首页：悬浮在云天里、可 360° 拖动旋转的纸盒
-   盒子各个面上印的字在 FACES 里改
+   首页：悬浮在云天里的一块黑色实心正方体
+   重量感来自运动：推得动但很慢、转起来停不下、最后“落”在一个面上
    ========================================================== */
 import * as THREE from "three";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
-const FACES = {
-  lidFront:    [{ text: "Daria Feng", at: "bottom-left", size: 0.055, weight: 600 }],
-  lidBack:     [{ text: "Blog · Career · Sports", at: "bottom-left", size: 0.045, weight: 500 }],
-  lidLeft:     [{ text: "dariafeng.com", at: "bottom-left", size: 0.04, weight: 500 }],
-  lidTop:      [{ text: "DF", at: "center", size: 0.09, weight: 600 }],
-  bottomRight: [{ text: "Est. 2026", at: "top-left", size: 0.04 }],
-};
+/* ---------- 可调参数 ---------- */
+const SIZE = 1.0;         // 边长
+const BEVEL = 0.03;       // 倒角半径：边缘接光，显得是实心的一块
+const COLOR = "#030303";  // 方块颜色
 
-const PAPER = "#000000";   // 盒子纸张颜色（纯黑）
-const INNER = "#c4bfb2";   // 中间露出的内盒颜色
-const GOLD  = "#e6c98a";   // 烫金字颜色
-const FONT  = '"Inter", "Helvetica Neue", Arial, sans-serif';
-
-// 盒子尺寸（单位随意，保持比例即可）
-const W = 0.78, D = 0.78; // 底面接近正方形
-const LID_H = 0.68, BAND_H = 0.05, BOTTOM_H = 0.56;
+const DRAG_GAIN = 0.006;  // 拖动 1px 对应的转速
+const RESPONSE = 4.5;     // 越小越“重”：跟手越慢
+const FRICTION = 0.45;    // 越小转得越久才停
+const SPRING = 3.0;       // 落定到某个面时的回复力
+const DAMPING = 2.1;      // 落定时的阻尼（越小回摆越明显）
+const IDLE_TURN = 9000;   // 没人碰多久后自己缓缓翻一面（毫秒）
 
 const canvas = document.getElementById("stage");
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -31,18 +26,13 @@ try {
 } catch (e) {
   console.warn("WebGL unavailable", e);
 }
-
-if (renderer) {
-  await document.fonts.load(`600 40px Inter`).catch(() => {});
-  await document.fonts.load(`500 40px Inter`).catch(() => {});
-  init();
-}
+if (renderer) init();
 
 function init() {
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.8;
+  renderer.toneMappingExposure = 0.9;
   renderer.autoClear = false;
 
   /* ---------- 天空（全屏 shader：深蓝底 + 缓慢飘动的云） ---------- */
@@ -73,7 +63,6 @@ function init() {
         vec3 high = vec3(0.10, 0.20, 0.36);
         vec3 sky = mix(deep, high, smoothstep(0.0, 1.0, uv.y + 0.15 * uv.x));
 
-        // 两层云，远处的淡、近处的亮
         float c1 = fbm(p * 1.3 + vec2(t, t * 0.3));
         float c2 = fbm(p * 2.6 + vec2(t * 1.8, -t * 0.4) + c1);
         float clouds = smoothstep(0.48, 0.85, c1 * 0.6 + c2 * 0.55);
@@ -81,11 +70,9 @@ function init() {
         vec3 cloudCol = mix(vec3(0.42, 0.50, 0.62), vec3(0.78, 0.82, 0.88), c2);
         sky = mix(sky, cloudCol, clouds * 0.75 + wisps);
 
-        // 暗角
         float vig = smoothstep(1.25, 0.35, length(uv - 0.5));
         sky *= mix(0.72, 1.0, vig);
 
-        // 轻微颗粒，像照片
         sky += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.025;
         gl_FragColor = vec4(sky, 1.0);
       }`,
@@ -98,197 +85,167 @@ function init() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
 
+  // 环境反射：上方是明亮的天空，下方是黑的 → 顶面接天光，底面沉在暗处，显得重
+  const envScene = new THREE.Scene();
+  const envGeo = new THREE.SphereGeometry(10, 64, 32);
+  const envCols = [];
+  const pos = envGeo.attributes.position;
+  const top = new THREE.Color("#b9c8de"), mid = new THREE.Color("#2b4466"), bot = new THREE.Color("#000000");
+  for (let i = 0; i < pos.count; i++) {
+    const h = pos.getY(i) / 10; // -1 … 1
+    const c = h > 0 ? mid.clone().lerp(top, Math.pow(h, 0.7)) : mid.clone().lerp(bot, Math.min(1, -h * 3));
+    envCols.push(c.r, c.g, c.b);
+  }
+  envGeo.setAttribute("color", new THREE.Float32BufferAttribute(envCols, 3));
+  envScene.add(new THREE.Mesh(envGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environment = pmrem.fromScene(envScene, 0.02).texture;
 
-  // 主光从左前上方打来：正面亮、侧面暗、底面几乎全黑，像参考图
   const sun = new THREE.DirectionalLight(0xfff1e0, 2.6);
   sun.position.set(1.8, 2.4, 2.2);
   scene.add(sun);
-  const rim = new THREE.DirectionalLight(0x9fb8e0, 0.6); // 天空反光
-  rim.position.set(3, 1, -2);
+  const rim = new THREE.DirectionalLight(0x9fb8e0, 1.2); // 天空反光，勾出背光面的边
+  rim.position.set(-3, 1.5, -2);
   scene.add(rim);
-  scene.add(new THREE.HemisphereLight(0x5d7598, 0x020305, 0.25));
+  scene.add(new THREE.HemisphereLight(0x5d7598, 0x000000, 0.15));
 
-  /* ---------- 纸张纹理 ---------- */
-  // 每个面画一张 canvas：纸色 + 细纤维噪点 + 烫金字
-  const PX = 1024; // 每单位长度多少像素
-  const aniso = renderer.capabilities.getMaxAnisotropy();
+  /* ---------- 方块 ---------- */
+  // 很细的颗粒粗糙度，像磨砂石材 / 喷砂金属
+  const grain = document.createElement("canvas");
+  grain.width = grain.height = 512;
+  const gctx = grain.getContext("2d");
+  const img = gctx.createImageData(512, 512);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 150 + Math.random() * 60;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+    img.data[i + 3] = 255;
+  }
+  gctx.putImageData(img, 0, 0);
+  const grainTex = new THREE.CanvasTexture(grain);
+  grainTex.wrapS = grainTex.wrapT = THREE.RepeatWrapping;
 
-  function paperNoise(ctx, w, h, base, amount) {
-    ctx.fillStyle = base;
-    ctx.fillRect(0, 0, w, h);
-    const img = ctx.getImageData(0, 0, w, h);
-    const d = img.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const n = (Math.random() - 0.5) * amount;
-      d[i] += n; d[i + 1] += n; d[i + 2] += n;
+  const cube = new THREE.Mesh(
+    new RoundedBoxGeometry(SIZE, SIZE, SIZE, 8, BEVEL),
+    new THREE.MeshPhysicalMaterial({
+      color: COLOR,
+      roughness: 0.7,
+      roughnessMap: grainTex,
+      metalness: 0,
+      specularIntensity: 0.45,
+      clearcoat: 0.2,
+      clearcoatRoughness: 0.35,
+      envMapIntensity: 0.4,
+    })
+  );
+  const holder = new THREE.Group(); // 负责上下漂浮；cube 自己负责旋转
+  holder.add(cube);
+  scene.add(holder);
+
+  /* ---------- 旋转物理 ---------- */
+  // 默认视角：稍微仰视，能同时看到三个面
+  const VIEW = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.32, 0.62, 0, "XYZ"));
+
+  // 正方体的 24 种“摆正”姿态
+  const UPRIGHT = [];
+  {
+    const seen = new Set();
+    const r = [0, 1, 2, 3].map((k) => (k * Math.PI) / 2);
+    for (const x of r) for (const y of r) for (const z of r) {
+      const u = new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z));
+      const key = new THREE.Matrix4().makeRotationFromQuaternion(u).elements.map(Math.round).join();
+      if (!seen.has(key)) { seen.add(key); UPRIGHT.push(u); }
     }
-    ctx.putImageData(img, 0, 0);
-    // 纤维
-    ctx.globalAlpha = 0.05;
-    for (let i = 0; i < (w * h) / 900; i++) {
-      ctx.strokeStyle = Math.random() > 0.5 ? "#fff" : "#000";
-      ctx.lineWidth = 0.6;
-      ctx.beginPath();
-      const x = Math.random() * w, y = Math.random() * h, a = Math.random() * Math.PI;
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + Math.cos(a) * 8, y + Math.sin(a) * 8);
-      ctx.stroke();
+  }
+  const nearestRest = (q) => {
+    let best = null, bestDot = -1;
+    for (const u of UPRIGHT) {
+      const c = VIEW.clone().multiply(u);
+      const d = Math.abs(q.dot(c));
+      if (d > bestDot) { bestDot = d; best = c; }
     }
-    ctx.globalAlpha = 1;
-  }
+    return best;
+  };
 
-  function drawText(ctx, w, h, items, color) {
-    const pad = 0.07 * PX;
-    ctx.fillStyle = color;
-    items.forEach((it) => {
-      const size = it.size * PX;
-      ctx.font = `${it.weight || 500} ${size}px ${FONT}`;
-      const lh = size * 1.3;
-      const line = it.line || 0;
-      if (it.at === "center") {
-        ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText(it.text, w / 2, h / 2 + line * lh);
-      } else if (it.at === "top-left") {
-        ctx.textAlign = "left"; ctx.textBaseline = "top";
-        ctx.fillText(it.text, pad, pad * 0.9 + line * lh);
-      } else { // bottom-left：多行时 line 越大越靠下
-        const count = items.filter((x) => x.at === "bottom-left").length;
-        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-        ctx.fillText(it.text, pad, h - pad - (count - 1 - line) * lh);
-      }
-    });
-  }
-
-  function faceMaterial(w, h, items = [], base = PAPER) {
-    const cw = Math.round(w * PX), ch = Math.round(h * PX);
-    const mk = () => { const c = document.createElement("canvas"); c.width = cw; c.height = ch; return c; };
-
-    const color = mk(), cctx = color.getContext("2d", { willReadFrequently: true });
-    paperNoise(cctx, cw, ch, base, 14);
-    drawText(cctx, cw, ch, items, GOLD);
-
-    // 金属度：字是金属，纸不是
-    const metal = mk(), mctx = metal.getContext("2d");
-    mctx.fillStyle = "#000"; mctx.fillRect(0, 0, cw, ch);
-    drawText(mctx, cw, ch, items, "#fff");
-
-    // 粗糙度：纸很粗糙，金字比较亮
-    const rough = mk(), rctx = rough.getContext("2d", { willReadFrequently: true });
-    paperNoise(rctx, cw, ch, "#f2f2f2", 30);
-    drawText(rctx, cw, ch, items, "#383838");
-
-    const tex = (c, srgb) => {
-      const t = new THREE.CanvasTexture(c);
-      if (srgb) t.colorSpace = THREE.SRGBColorSpace;
-      t.anisotropy = aniso;
-      return t;
-    };
-    return new THREE.MeshPhysicalMaterial({
-      specularIntensity: base === PAPER ? 0.35 : 1, // 压低黑纸高光（只影响纸，不影响金字）
-      map: tex(color, true),
-      metalnessMap: tex(metal), metalness: 1,
-      roughnessMap: tex(rough), roughness: 1,
-      bumpMap: tex(rough), bumpScale: 0.6,
-      envMapIntensity: base === PAPER ? 0.12 : 0.35, // 黑纸少反光，显得更黑
-    });
-  }
-
-  // BoxGeometry 的面顺序：右 左 上 下 前 后
-  const plain = (w, h) => faceMaterial(w, h);
-  const lidMats = [
-    plain(D, LID_H),
-    faceMaterial(D, LID_H, FACES.lidLeft),
-    faceMaterial(W, D, FACES.lidTop),
-    plain(W, D),
-    faceMaterial(W, LID_H, FACES.lidFront),
-    faceMaterial(W, LID_H, FACES.lidBack),
-  ];
-  const bottomMats = [
-    faceMaterial(D, BOTTOM_H, FACES.bottomRight),
-    plain(D, BOTTOM_H),
-    plain(W, D),
-    plain(W, D),
-    plain(W, BOTTOM_H),
-    plain(W, BOTTOM_H),
-  ];
-  const innerMat = faceMaterial(W, BAND_H + 0.1, [], INNER);
-
-  const box = new THREE.Group();
-  const H = LID_H + BAND_H + BOTTOM_H;
-
-  const bottom = new THREE.Mesh(new THREE.BoxGeometry(W, BOTTOM_H, D), bottomMats);
-  bottom.position.y = -H / 2 + BOTTOM_H / 2;
-
-  const inner = new THREE.Mesh(new THREE.BoxGeometry(W - 0.02, BAND_H + 0.1, D - 0.02), innerMat);
-  inner.position.y = -H / 2 + BOTTOM_H + BAND_H / 2;
-
-  const lid = new THREE.Mesh(new THREE.BoxGeometry(W, LID_H, D), lidMats);
-  const lidRestY = H / 2 - LID_H / 2;
-  lid.position.y = lidRestY;
-
-  box.add(bottom, inner, lid);
-  scene.add(box);
-
-  /* ---------- 拖动旋转 + 惯性 ---------- */
-  const BASE_TILT = -0.22; // 负数 = 从下往上仰视，能看到盒底
-  const AUTO_SPEED = reduceMotion ? 0 : 0.18; // 没人碰时的自转速度（弧度/秒）
-  let rotY = -0.5, rotX = BASE_TILT;
-  let vY = 0, vX = 0;
-  let dragging = false, lastX = 0, lastY = 0, lastT = 0, idleSince = 0;
+  const q = VIEW.clone();                 // 当前姿态
+  let target = VIEW.clone();              // 要落定的姿态
+  const w = new THREE.Vector3();          // 角速度（世界坐标，弧度/秒）
+  let dragging = false, accX = 0, accY = 0, lastX = 0, lastY = 0;
+  let idleSince = performance.now();
 
   canvas.addEventListener("pointerdown", (e) => {
     dragging = true;
     canvas.setPointerCapture(e.pointerId);
     canvas.classList.add("dragging");
-    lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
-    vY = vX = 0;
+    lastX = e.clientX; lastY = e.clientY;
+    accX = accY = 0;
   });
   canvas.addEventListener("pointermove", (e) => {
-    updateHover(e);
     if (!dragging) return;
-    const now = performance.now();
-    const dt = Math.max(1, now - lastT) / 1000;
-    const dx = e.clientX - lastX, dy = e.clientY - lastY;
-    const k = 0.009;
-    rotY += dx * k;
-    rotX = THREE.MathUtils.clamp(rotX + dy * k, -1.1, 1.1);
-    vY = (dx * k) / dt;
-    vX = (dy * k) / dt;
-    lastX = e.clientX; lastY = e.clientY; lastT = now;
+    accX += e.clientX - lastX;
+    accY += e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
   });
-  const release = (e) => {
+  const release = () => {
     if (!dragging) return;
     dragging = false;
     canvas.classList.remove("dragging");
-    if (performance.now() - lastT > 80) vY = vX = 0; // 停顿后才松手 → 不甩出去
     idleSince = performance.now();
   };
   canvas.addEventListener("pointerup", release);
   canvas.addEventListener("pointercancel", release);
 
-  /* ---------- 鼠标悬停时盖子微微抬起 ---------- */
-  const ray = new THREE.Raycaster();
-  const ndc = new THREE.Vector2();
-  let hovering = false;
-  function updateHover(e) {
-    const r = canvas.getBoundingClientRect();
-    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-    ray.setFromCamera(ndc, camera);
-    hovering = ray.intersectObject(box, true).length > 0;
+  const tmpQ = new THREE.Quaternion();
+  const errQ = new THREE.Quaternion();
+  const axis = new THREE.Vector3();
+  const wTarget = new THREE.Vector3();
+  const Y = new THREE.Vector3(0, 1, 0);
+
+  function step(dt, now) {
+    if (dragging) {
+      // 手指想让它转多快 → 方块慢慢追上这个速度（质量大，追得慢）
+      wTarget.set(accY, accX, 0).multiplyScalar(DRAG_GAIN / dt);
+      accX = accY = 0;
+      w.lerp(wTarget, 1 - Math.exp(-RESPONSE * dt));
+      target = nearestRest(q);
+    } else {
+      // 摩擦
+      w.multiplyScalar(Math.exp(-FRICTION * dt));
+      // 转得快时，目标面跟着换；慢下来后锁定，弹簧把它拉过去
+      if (w.length() > 0.7) target = nearestRest(q);
+
+      errQ.copy(target).multiply(tmpQ.copy(q).invert());
+      if (errQ.w < 0) { errQ.x *= -1; errQ.y *= -1; errQ.z *= -1; errQ.w *= -1; }
+      const angle = 2 * Math.acos(Math.min(1, errQ.w));
+      const s = Math.sqrt(1 - errQ.w * errQ.w);
+      if (s > 1e-5) axis.set(errQ.x / s, errQ.y / s, errQ.z / s); else axis.set(0, 0, 0);
+
+      // 角加速度 = 弹簧 − 阻尼
+      w.addScaledVector(axis, SPRING * angle * dt);
+      w.multiplyScalar(Math.exp(-DAMPING * dt));
+
+      // 静止够久了，自己沉沉地翻一面
+      if (!reduceMotion && now - idleSince > IDLE_TURN && w.length() < 0.02 && angle < 0.01) {
+        target = new THREE.Quaternion().setFromAxisAngle(Y, -Math.PI / 2).multiply(target);
+        idleSince = now;
+      }
+    }
+
+    const speed = w.length();
+    if (speed > 1e-6) {
+      tmpQ.setFromAxisAngle(axis.copy(w).divideScalar(speed), speed * dt);
+      q.premultiply(tmpQ).normalize();
+    }
+    cube.quaternion.copy(q);
   }
-  canvas.addEventListener("pointerleave", () => { hovering = false; });
 
   /* ---------- 尺寸 ---------- */
   function resize() {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    // 竖屏手机上把相机拉远一点，让盒子完整显示
-    const dist = camera.aspect < 0.8 ? 6.2 / Math.max(camera.aspect, 0.45) * 0.55 : 4.3;
-    camera.position.set(0, -0.25, dist);
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    if (!cw || !ch) return;
+    renderer.setSize(cw, ch, false);
+    camera.aspect = cw / ch;
+    const dist = camera.aspect < 0.8 ? 6.2 / Math.max(camera.aspect, 0.45) * 0.55 : 4.6;
+    camera.position.set(0, -0.2, dist);
     camera.lookAt(0, 0.05, 0);
     camera.updateProjectionMatrix();
     skyMat.uniforms.uRes.value.set(renderer.domElement.width, renderer.domElement.height);
@@ -303,31 +260,11 @@ function init() {
     prev = now;
     const t = now / 1000;
 
-    if (!dragging) {
-      // 惯性衰减
-      const decay = Math.pow(0.04, dt);
-      vY *= decay; vX *= decay;
-      rotY += vY * dt;
-      rotX += vX * dt;
-      // 慢慢回到默认倾斜角
-      rotX += (BASE_TILT - rotX) * (1 - Math.pow(0.2, dt));
-      // 停下来一会儿后恢复自转
-      if (Math.abs(vY) < AUTO_SPEED && now - idleSince > 1200) {
-        vY += (AUTO_SPEED - vY) * (1 - Math.pow(0.5, dt));
-      }
-    }
-
-    // XYZ：先绕竖轴转，再朝镜头俯仰，俯仰轴始终是水平的
-    box.rotation.set(rotX, rotY, reduceMotion ? 0 : Math.sin(t * 0.5) * 0.025, "XYZ");
-    box.position.y = reduceMotion ? 0 : Math.sin(t * 0.8) * 0.035;
-
-    const lidTarget = lidRestY + (hovering && !dragging ? 0.06 : 0);
-    lid.position.y += (lidTarget - lid.position.y) * (1 - Math.pow(0.001, dt));
-    inner.scale.y = 1 + (lid.position.y - lidRestY) / (BAND_H + 0.1) * 1.2;
-    inner.position.y = -H / 2 + BOTTOM_H + (BAND_H + 0.1) * inner.scale.y / 2 - 0.05;
+    step(Math.max(dt, 1e-3), now);
+    // 很慢、很小的漂浮：重的东西不会晃得轻快
+    holder.position.y = reduceMotion ? 0 : Math.sin(t * 0.9) * 0.018;
 
     skyMat.uniforms.uTime.value = t;
-
     renderer.clear();
     renderer.render(skyScene, skyCam);
     renderer.render(scene, camera);
@@ -343,7 +280,6 @@ function init() {
   }
   function stop() { running = false; }
 
-  // 只有在首页、且页面可见时才渲染，省电
   const onHome = () => document.querySelector('[data-tab="home"]').classList.contains("is-active");
   addEventListener("tabchange", (e) => (e.detail === "home" && !document.hidden ? start() : stop()));
   document.addEventListener("visibilitychange", () => (!document.hidden && onHome() ? start() : stop()));
