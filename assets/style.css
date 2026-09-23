@@ -134,7 +134,7 @@ body.on-dark .top { color: #f3f1ea; }
 .page ul { padding-left: 1.2em; }
 
 /* 左侧子 tab（Sports 里的 Climbing / Dance） */
-.page-wide { max-width: 880px; }
+.page-wide { max-width: 1080px; }
 .subtabs { display: grid; grid-template-columns: 160px 1fr; gap: 40px; }
 .subnav { display: flex; flex-direction: column; gap: 4px; }
 .subnav a { text-decoration: none; padding: 6px 0; opacity: .5; transition: opacity .2s; }
@@ -143,6 +143,70 @@ body.on-dark .top { color: #f3f1ea; }
 .subpanel { display: none; }
 .subpanel.is-active { display: block; }
 .subpanel h2:first-child { margin-top: 0; }
+
+/* ---------- Climbing 地图 ---------- */
+:root { --outdoor: #ff5a1f; --gym: #111; --visited: #ffd9c7; --land: #ececec; }
+.climb-stats { color: #777; font-size: 14px; margin-bottom: 12px; }
+.climb-map {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  background: #fafafa;
+  border: 1px solid #eee; border-radius: 8px;
+  overflow: hidden;
+  touch-action: none;
+}
+.climb-map svg { display: block; width: 100%; height: 100%; cursor: grab; }
+.climb-map svg:active { cursor: grabbing; }
+.map-msg { position: absolute; inset: 0; display: grid; place-items: center; color: #999; font-size: 14px; }
+.country { fill: var(--land); stroke: #fff; stroke-width: .5; vector-effect: non-scaling-stroke; }
+.country.is-visited { fill: var(--visited); }
+.pin { cursor: pointer; outline: none; }
+.pin path { stroke: #fff; stroke-width: 1; vector-effect: non-scaling-stroke; transition: transform .2s; }
+.pin circle { fill: #fff; }
+.pin-outdoor path { fill: var(--outdoor); }
+.pin-gym path { fill: var(--gym); }
+.pin:hover path, .pin:focus-visible path { transform: scale(1.3); transform-origin: 0 0; }
+.map-ctrl { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
+.map-ctrl button {
+  width: 30px; height: 30px; border-radius: 6px;
+  background: #fff; border: 1px solid #ddd;
+  font-size: 16px; line-height: 1;
+}
+.map-ctrl button:hover { border-color: #999; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 13px; color: #555; }
+.map-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.map-hint { margin-left: auto; color: #999; }
+.cl-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.cl-outdoor { background: var(--outdoor); }
+.cl-gym { background: var(--gym); }
+.cl-swatch { display: inline-block; width: 14px; height: 10px; background: var(--visited); border-radius: 2px; }
+
+.climb-list { list-style: none; padding: 0 !important; margin-top: 28px; border-top: 1px solid #eee; }
+.climb-list button {
+  width: 100%; text-align: left;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid #eee;
+}
+.climb-list button:hover .cl-name { text-decoration: underline; text-underline-offset: 3px; }
+.cl-meta { font-size: 13px; color: #888; }
+
+.spot-dialog {
+  width: min(720px, calc(100% - 32px)); max-height: calc(100% - 64px);
+  margin: auto; padding: 28px;
+  border: 0; border-radius: 12px;
+  overflow-y: auto;
+}
+.spot-dialog::backdrop { background: rgba(0,0,0,.55); }
+.spot-close { position: sticky; top: 0; float: right; font-size: 18px; opacity: .6; }
+.spot-close:hover { opacity: 1; }
+.spot-meta { font-size: 13px; color: #888; }
+.spot-dialog h3 { font-size: 24px; font-weight: 600; margin: 4px 0 12px; }
+.spot-note { margin-bottom: 16px; }
+.spot-empty { color: #999; }
+.spot-media { display: grid; gap: 16px; }
+.spot-media img, .spot-media video { width: 100%; border-radius: 6px; display: block; }
+.spot-media .embed iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 6px; }
+.spot-media figcaption { font-size: 13px; color: #888; margin-top: 6px; }
 
 @media (max-width: 640px) {
   .top { flex-wrap: wrap; gap: 8px 16px; }
@@ -153,4 +217,11 @@ body.on-dark .top { color: #f3f1ea; }
   /* 手机上子 tab 放到上面，横排 */
   .subtabs { grid-template-columns: 1fr; gap: 24px; }
   .subnav { flex-direction: row; gap: 20px; border-bottom: 1px solid #e5e5e5; }
+  /* 攀岩列表：地点信息换到名字下面 */
+  .climb-list button { grid-template-columns: auto 1fr; row-gap: 2px; }
+  .cl-meta { grid-column: 2; }
+  .map-hint .desk { display: none; }
+}
+@media (min-width: 641px) {
+  .map-hint .touch { display: none; }
 }
