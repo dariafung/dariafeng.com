@@ -50,7 +50,7 @@ body.on-home .top { color: #f3f1ea; }
 
 .home-info {
   position: absolute; left: 0; right: 0; bottom: 0;
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;
   padding: 24px clamp(16px, 4vw, 40px) 28px;
   font-size: 14px; line-height: 1.5;
   pointer-events: none;

@@ -9,7 +9,7 @@ const FACES = {
   lidFront:    [{ text: "Daria Feng", at: "bottom-left", size: 0.055, weight: 600 }],
   lidRight:    [{ text: "Latest interest", at: "bottom-left", size: 0.04, weight: 600 },
                 { text: "…", at: "bottom-left", size: 0.04, line: 1 }],
-  lidBack:     [{ text: "hello@dariafeng.com", at: "bottom-left", size: 0.045, weight: 500 }],
+  lidBack:     [{ text: "Blog · Career · Sports", at: "bottom-left", size: 0.045, weight: 500 }],
   lidLeft:     [{ text: "dariafeng.com", at: "bottom-left", size: 0.04, weight: 500 }],
   lidTop:      [{ text: "DF", at: "center", size: 0.09, weight: 600 }],
   bottomFront: [{ text: "Student", at: "top-left", size: 0.042 },
