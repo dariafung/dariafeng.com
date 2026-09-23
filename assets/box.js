@@ -13,7 +13,7 @@ const FACES = {
   bottomRight: [{ text: "Est. 2026", at: "top-left", size: 0.04 }],
 };
 
-const PAPER = "#2e3331";   // 盒子纸张颜色（灰绿）
+const PAPER = "#000000";   // 盒子纸张颜色（纯黑）
 const INNER = "#c4bfb2";   // 中间露出的内盒颜色
 const GOLD  = "#e6c98a";   // 烫金字颜色
 const FONT  = '"Inter", "Helvetica Neue", Arial, sans-serif';
@@ -176,7 +176,7 @@ function init() {
 
     // 粗糙度：纸很粗糙，金字比较亮
     const rough = mk(), rctx = rough.getContext("2d", { willReadFrequently: true });
-    paperNoise(rctx, cw, ch, "#e0e0e0", 40);
+    paperNoise(rctx, cw, ch, "#f2f2f2", 30);
     drawText(rctx, cw, ch, items, "#383838");
 
     const tex = (c, srgb) => {
@@ -185,12 +185,13 @@ function init() {
       t.anisotropy = aniso;
       return t;
     };
-    return new THREE.MeshStandardMaterial({
+    return new THREE.MeshPhysicalMaterial({
+      specularIntensity: base === PAPER ? 0.35 : 1, // 压低黑纸高光（只影响纸，不影响金字）
       map: tex(color, true),
       metalnessMap: tex(metal), metalness: 1,
       roughnessMap: tex(rough), roughness: 1,
       bumpMap: tex(rough), bumpScale: 0.6,
-      envMapIntensity: 0.35,
+      envMapIntensity: base === PAPER ? 0.12 : 0.35, // 黑纸少反光，显得更黑
     });
   }
 
