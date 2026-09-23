@@ -35,7 +35,8 @@
       page.querySelectorAll("[data-sub-link]").forEach((a) =>
         a.classList.toggle("is-active", a.dataset.subLink === current));
     }
-    document.body.classList.toggle("on-home", active === "home");
+    // 首页和 Blog 是深色背景，header 文字变白
+    document.body.classList.toggle("on-dark", active === "home" || active === "blog");
     window.dispatchEvent(new CustomEvent("tabchange", { detail: active }));
     window.scrollTo(0, 0);
   }

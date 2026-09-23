@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
   <!-- 每次更新网站时改一下 ?v= 后面的版本号，访客就会拿到新文件，不会用缓存里的旧版 -->
-  <link rel="stylesheet" href="assets/style.css?v=20260923g">
+  <link rel="stylesheet" href="assets/style.css?v=20260923h">
   <script type="importmap">
     { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
@@ -42,9 +42,13 @@
     </section>
 
     <!-- ========== Blog ========== -->
-    <section class="tab page" data-tab="blog">
-      <h1><span lang="en">Blog</span><span lang="zh">博客</span></h1>
-      <p>…</p>
+    <section class="tab blog" data-tab="blog">
+      <h1 class="sr-only"><span lang="en">Blog</span><span lang="zh">博客</span></h1>
+      <canvas id="constellation" aria-hidden="true"></canvas>
+      <nav id="blogLabels" class="blog-labels" aria-label="Tags"></nav>
+      <div id="blogTip" class="blog-tip" hidden></div>
+      <aside id="blogPanel" class="blog-panel" aria-live="polite"></aside>
+      <article id="blogPost" class="blog-post" hidden></article>
     </section>
 
     <!-- ========== Career ========== -->
@@ -91,7 +95,9 @@
     </section>
   </main>
 
-  <script src="assets/main.js?v=20260923g"></script>
-  <script type="module" src="assets/box.js?v=20260923g"></script>
+  <script src="assets/posts.js?v=20260923h"></script>
+  <script src="assets/main.js?v=20260923h"></script>
+  <script src="assets/blog.js?v=20260923h"></script>
+  <script type="module" src="assets/box.js?v=20260923h"></script>
 </body>
 </html>
