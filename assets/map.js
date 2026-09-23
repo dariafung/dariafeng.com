@@ -1,6 +1,6 @@
 /* ==========================================================
    Sports → Climbing：世界地图 + 钉子
-   - 去过的国家自动涂色（根据钉子落在哪个国家）
+   - 去过的地方自动涂色：有州/省数据的国家（美、中、加、澳、巴西、印度、印尼、俄、南非）按州/省涂，其他按国家涂
    - 点钉子弹出照片 / 视频
    数据在 assets/climbing.js
    地图库（d3、世界地图数据）只在第一次打开 Climbing 时才加载
@@ -11,6 +11,7 @@
     "https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js",
   ];
   const ATLAS = "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json";
+  const ADMIN1 = "assets/geo/admin1.json?v=1"; // 州 / 省边界（Natural Earth 1:50m，已精简）
 
   const panel = document.querySelector('[data-sub="climbing"]');
   const box = document.getElementById("climbMap");
@@ -26,6 +27,13 @@
   const TYPE = {
     outdoor: { en: "Outdoor", zh: "户外" },
     gym: { en: "Gym", zh: "岩馆" },
+  };
+  // “Wisconsin, United States of America”；州/省名有中文时中文模式显示中文
+  const where = (s) => {
+    const c = s.country ? esc(s.country.properties.name) : "";
+    if (!s.region) return c ? " · " + c : "";
+    const r = s.region.properties;
+    return ` · <span lang="en">${esc(r.name)}</span><span lang="zh">${esc(r.name_zh || r.name)}</span>${c ? ", " + c : ""}`;
   };
   // 常去的岩馆显示 “Home gym”，其他显示日期
   const when = (s) => (s.home ? " · Home gym" : s.date ? " · " + esc(s.date) : "");
@@ -50,8 +58,8 @@
   async function load() {
     try {
       for (const src of LIBS) await loadScript(src);
-      const world = await fetch(ATLAS).then((r) => r.json());
-      init(world);
+      const [world, admin1] = await Promise.all([ATLAS, ADMIN1].map((u) => fetch(u).then((r) => r.json())));
+      init(world, admin1);
     } catch (e) {
       console.error(e);
       box.innerHTML = `<p class="map-msg"><span lang="en">The map couldn't load. Try refreshing.</span><span lang="zh">地图加载失败，刷新试试。</span></p>`;
@@ -59,7 +67,7 @@
   }
 
   /* ---------- 地图 ---------- */
-  function init(world) {
+  function init(world, admin1) {
     const d3 = window.d3;
     const W = 960, H = 480;
 
@@ -84,11 +92,30 @@
       }
       return null;
     }
+    // 州 / 省：d3 要求多边形顺时针，数据是逆时针，先翻过来
+    admin1.features.forEach((f) => {
+      f.geometry.coordinates = f.geometry.coordinates.map((poly) =>
+        d3.geoArea({ type: "Polygon", coordinates: poly }) > 2 * Math.PI ? poly.map((r) => r.slice().reverse()) : poly);
+    });
+    const regionsOf = d3.group(admin1.features, (f) => f.properties.admin);
+    function findRegion(s, country) {
+      const list = country && regionsOf.get(country.properties.name);
+      if (!list) return null;
+      return list.find((f) => d3.geoContains(f, [s.lng, s.lat]))
+        || list.map((f) => ({ f, d: d3.geoDistance([s.lng, s.lat], d3.geoCentroid(f)) })).sort((a, b) => a.d - b.d)[0].f;
+    }
+
     SPOTS.forEach((s) => {
       s.country = findCountry(s);
+      s.region = findRegion(s, s.country);
       [s.x, s.y] = projection([s.lng, s.lat]);
     });
-    const visited = new Set(SPOTS.map((s) => s.country).filter(Boolean));
+    const visitedCountries = new Set(SPOTS.map((s) => s.country).filter(Boolean));
+    const visitedRegions = new Set(SPOTS.map((s) => s.region).filter(Boolean));
+    // 没有州/省数据的国家，整个国家涂色
+    const filledCountries = new Set(SPOTS.filter((s) => s.country && !s.region).map((s) => s.country));
+    // 有涂色州/省的国家，顺便画出它所有州/省的细边界
+    const detailCountries = new Set([...visitedRegions].map((f) => f.properties.admin));
 
     box.innerHTML = "";
     const svg = d3.select(box).append("svg")
@@ -100,8 +127,14 @@
     g.append("g").attr("class", "countries")
       .selectAll("path").data(countries).join("path")
       .attr("d", path)
-      .attr("class", (c) => (visited.has(c) ? "country is-visited" : "country"))
+      .attr("class", (c) => (filledCountries.has(c) ? "country is-visited" : "country"))
       .append("title").text((c) => c.properties.name);
+
+    g.append("g").attr("class", "regions")
+      .selectAll("path").data(admin1.features.filter((f) => detailCountries.has(f.properties.admin))).join("path")
+      .attr("d", path)
+      .attr("class", (f) => (visitedRegions.has(f) ? "region is-visited" : "region"))
+      .append("title").text((f) => f.properties.name);
 
     // 钉子：尖端正好落在坐标上。离得太近（在当前缩放下重叠）的钉子合成一个带数字的圆点
     const PIN = "M0,0 C-2.4,-4.2 -6,-7.4 -6,-11.5 A6,6 0 1 1 6,-11.5 C6,-7.4 2.4,-4.2 0,0 Z";
@@ -186,10 +219,12 @@
 
     /* ---------- 统计 + 列表 ---------- */
     const n = (t) => SPOTS.filter((s) => (t === "gym" ? s.type === "gym" : s.type !== "gym")).length;
+    const nc = visitedCountries.size, nr = visitedRegions.size;
     statsEl.innerHTML = SPOTS.length
-      ? `<span lang="en">${visited.size} ${visited.size === 1 ? "country" : "countries"} · ${n("outdoor")} outdoor · ${n("gym")} ${n("gym") === 1 ? "gym" : "gyms"}</span>
-         <span lang="zh">${visited.size} 个国家 · ${n("outdoor")} 个户外岩场 · ${n("gym")} 个岩馆</span>`
+      ? `<span lang="en">${nc} ${nc === 1 ? "country" : "countries"}${nr ? ` · ${nr} ${nr === 1 ? "state / province" : "states / provinces"}` : ""} · ${n("outdoor")} outdoor · ${n("gym")} ${n("gym") === 1 ? "gym" : "gyms"}</span>
+         <span lang="zh">${nc} 个国家${nr ? ` · ${nr} 个州 / 省` : ""} · ${n("outdoor")} 个户外岩场 · ${n("gym")} 个岩馆</span>`
       : `<span lang="en">No pins yet.</span><span lang="zh">还没有钉子。</span>`;
+    document.getElementById("climbCount").textContent = SPOTS.length;
 
     // Home gym 排最前，其余按日期从新到旧
     const byDate = [...SPOTS].sort((a, b) => (b.home ? 1 : 0) - (a.home ? 1 : 0) || String(b.date || "").localeCompare(String(a.date || "")));
@@ -197,7 +232,7 @@
       <li><button type="button" data-i="${SPOTS.indexOf(s)}">
         <span class="cl-dot cl-${s.type === "gym" ? "gym" : "outdoor"}" aria-hidden="true"></span>
         <span class="cl-name">${bi(s.name)}</span>
-        <span class="cl-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${s.country ? " · " + esc(s.country.properties.name) : ""}${when(s)}</span>
+        <span class="cl-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${where(s)}${when(s)}</span>
       </button></li>`).join("");
     listEl.addEventListener("click", (e) => {
       const b = e.target.closest("button[data-i]");
@@ -221,7 +256,7 @@
     const media = s.media || [];
     dialog.innerHTML = `
       <button type="button" class="spot-close" aria-label="Close">✕</button>
-      <p class="spot-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${s.country ? " · " + esc(s.country.properties.name) : ""}${when(s)}</p>
+      <p class="spot-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${where(s)}${when(s)}</p>
       <h3>${bi(s.name)}</h3>
       ${s.note ? `<p class="spot-note">${bi(s.note)}</p>` : ""}
       ${media.length

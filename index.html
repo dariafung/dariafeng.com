@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
   <!-- 每次更新网站时改一下 ?v= 后面的版本号，访客就会拿到新文件，不会用缓存里的旧版 -->
-  <link rel="stylesheet" href="assets/style.css?v=20260923j">
+  <link rel="stylesheet" href="assets/style.css?v=20260923k">
   <script type="importmap">
     { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
@@ -92,11 +92,15 @@
             <div class="map-legend">
               <span><i class="cl-dot cl-outdoor"></i><span lang="en">Outdoor</span><span lang="zh">户外</span></span>
               <span><i class="cl-dot cl-gym"></i><span lang="en">Gym</span><span lang="zh">岩馆</span></span>
-              <span><i class="cl-swatch"></i><span lang="en">Countries I've climbed in</span><span lang="zh">攀过的国家</span></span>
+              <span><i class="cl-swatch"></i><span lang="en">Places I've climbed (state / province)</span><span lang="zh">攀过的地方（州 / 省）</span></span>
               <span class="map-hint"><span class="desk"><span lang="en">Drag to move · Ctrl + scroll to zoom</span><span lang="zh">拖动平移 · 按住 Ctrl 滚动缩放</span></span><span class="touch"><span lang="en">Pinch to zoom</span><span lang="zh">双指缩放</span></span></span>
             </div>
 
-            <ul class="climb-list" id="climbList"></ul>
+            <!-- 地点清单，默认收起 -->
+            <details class="climb-details">
+              <summary><span lang="en">All places</span><span lang="zh">全部地点</span> (<span id="climbCount">0</span>)</summary>
+              <ul class="climb-list" id="climbList"></ul>
+            </details>
             <dialog class="spot-dialog" id="spotDialog"></dialog>
           </div>
 
@@ -109,11 +113,11 @@
     </section>
   </main>
 
-  <script src="assets/posts.js?v=20260923j"></script>
-  <script src="assets/main.js?v=20260923j"></script>
-  <script src="assets/blog.js?v=20260923j"></script>
-  <script src="assets/climbing.js?v=20260923j"></script>
-  <script src="assets/map.js?v=20260923j"></script>
-  <script type="module" src="assets/box.js?v=20260923j"></script>
+  <script src="assets/posts.js?v=20260923k"></script>
+  <script src="assets/main.js?v=20260923k"></script>
+  <script src="assets/blog.js?v=20260923k"></script>
+  <script src="assets/climbing.js?v=20260923k"></script>
+  <script src="assets/map.js?v=20260923k"></script>
+  <script type="module" src="assets/box.js?v=20260923k"></script>
 </body>
 </html>

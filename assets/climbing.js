@@ -31,7 +31,7 @@ window.CLIMBS = [
 
   // ---- 北京 ----（位置是大概的，确认分店后再改）
   { name: "Camp", type: "gym", date: "2026-07-19", lat: 39.9365, lng: 116.4540 },
-  { name: "Bloc1", type: "gym", date: "2026-07-15", lat: 39.9150, lng: 116.4300 },
+  { name: "Bloc1", type: "gym", date: "2026-07-25", lat: 39.9150, lng: 116.4300 },
   { name: "岩时", type: "gym", date: "2026-08-08", lat: 39.8930, lng: 116.4760 },        // 大望路店：西大望路27号院
 
   // ---- 户外 ----
