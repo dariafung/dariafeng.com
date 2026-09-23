@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
   <!-- 每次更新网站时改一下 ?v= 后面的版本号，访客就会拿到新文件，不会用缓存里的旧版 -->
-  <link rel="stylesheet" href="assets/style.css?v=20260923e">
+  <link rel="stylesheet" href="assets/style.css?v=20260923f">
   <script type="importmap">
     { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
@@ -66,21 +66,32 @@
     </section>
 
     <!-- ========== Sports ========== -->
-    <section class="tab page" data-tab="sports">
+    <section class="tab page page-wide" data-tab="sports">
       <h1><span lang="en">Sports</span><span lang="zh">运动</span></h1>
 
-      <h2>Barre</h2>
-      <p>…</p>
+      <div class="subtabs">
+        <!-- 左侧子 tab；网址是 #sports/climbing 和 #sports/dance -->
+        <nav class="subnav" aria-label="Sports">
+          <a href="#sports/climbing" data-sub-link="climbing"><span lang="en">Climbing</span><span lang="zh">攀岩</span></a>
+          <a href="#sports/dance" data-sub-link="dance"><span lang="en">Dance</span><span lang="zh">舞蹈</span></a>
+        </nav>
 
-      <h2><span lang="en">Swimming</span><span lang="zh">游泳</span></h2>
-      <p>…</p>
+        <div class="subpanels">
+          <div class="subpanel" data-sub="climbing">
+            <h2><span lang="en">Climbing</span><span lang="zh">攀岩</span></h2>
+            <p>…</p>
+          </div>
 
-      <h2><span lang="en">Bouldering</span><span lang="zh">抱石</span></h2>
-      <p>…</p>
+          <div class="subpanel" data-sub="dance">
+            <h2><span lang="en">Dance</span><span lang="zh">舞蹈</span></h2>
+            <p>…</p>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <script src="assets/main.js?v=20260923e"></script>
-  <script type="module" src="assets/box.js?v=20260923e"></script>
+  <script src="assets/main.js?v=20260923f"></script>
+  <script type="module" src="assets/box.js?v=20260923f"></script>
 </body>
 </html>

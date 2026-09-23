@@ -64,8 +64,22 @@ body.on-home .top { color: #f3f1ea; }
 .page h2 { font-size: 18px; font-weight: 600; margin: 32px 0 8px; }
 .page ul { padding-left: 1.2em; }
 
+/* 左侧子 tab（Sports 里的 Climbing / Dance） */
+.page-wide { max-width: 880px; }
+.subtabs { display: grid; grid-template-columns: 160px 1fr; gap: 40px; }
+.subnav { display: flex; flex-direction: column; gap: 4px; }
+.subnav a { text-decoration: none; padding: 6px 0; opacity: .5; transition: opacity .2s; }
+.subnav a:hover, .subnav a.is-active { opacity: 1; }
+.subnav a.is-active { font-weight: 600; }
+.subpanel { display: none; }
+.subpanel.is-active { display: block; }
+.subpanel h2:first-child { margin-top: 0; }
+
 @media (max-width: 640px) {
   .top { flex-wrap: wrap; gap: 8px 16px; }
   .tabs { order: 3; width: 100%; gap: 16px; }
   .hint { display: none; }
+  /* 手机上子 tab 放到上面，横排 */
+  .subtabs { grid-template-columns: 1fr; gap: 24px; }
+  .subnav { flex-direction: row; gap: 20px; border-bottom: 1px solid #e5e5e5; }
 }
