@@ -2,7 +2,7 @@
    Sports → Climbing：世界地图 + 钉子
    - 去过的国家自动涂色（根据钉子落在哪个国家）
    - 点钉子弹出照片 / 视频
-   数据在 assets/climbing.js；网址加 ?demo 可以看示例地点
+   数据在 assets/climbing.js
    地图库（d3、世界地图数据）只在第一次打开 Climbing 时才加载
    ========================================================== */
 (function () {
@@ -18,8 +18,7 @@
   const listEl = document.getElementById("climbList");
   const dialog = document.getElementById("spotDialog");
 
-  let SPOTS = window.CLIMBS || [];
-  if (new URLSearchParams(location.search).has("demo")) SPOTS = demoSpots();
+  const SPOTS = window.CLIMBS || [];
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const pick = (o, l) => (o == null ? "" : typeof o === "string" ? o : o[l] || o.en || o.zh || "");
@@ -28,6 +27,8 @@
     outdoor: { en: "Outdoor", zh: "户外" },
     gym: { en: "Gym", zh: "岩馆" },
   };
+  // 常去的岩馆显示 “Home gym”，其他显示日期
+  const when = (s) => (s.home ? " · Home gym" : s.date ? " · " + esc(s.date) : "");
 
   /* ---------- 只在 Climbing 可见时加载 ---------- */
   let started = false;
@@ -102,31 +103,65 @@
       .attr("class", (c) => (visited.has(c) ? "country is-visited" : "country"))
       .append("title").text((c) => c.properties.name);
 
-    // 钉子：尖端正好落在坐标上
+    // 钉子：尖端正好落在坐标上。离得太近（在当前缩放下重叠）的钉子合成一个带数字的圆点
     const PIN = "M0,0 C-2.4,-4.2 -6,-7.4 -6,-11.5 A6,6 0 1 1 6,-11.5 C6,-7.4 2.4,-4.2 0,0 Z";
-    const pins = g.append("g").attr("class", "pins")
-      .selectAll("g").data([...SPOTS].sort((a, b) => a.y - b.y)).join("g")
-      .attr("class", (s) => `pin pin-${s.type === "gym" ? "gym" : "outdoor"}`)
-      .attr("tabindex", 0)
-      .attr("role", "button")
-      .attr("aria-label", (s) => pick(s.name, "en"))
-      .attr("transform", (s) => `translate(${s.x},${s.y})`)
-      .on("click", (e, s) => openSpot(s))
-      .on("keydown", (e, s) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSpot(s); } });
-    pins.append("path").attr("d", PIN);
-    pins.append("circle").attr("cy", -11.5).attr("r", 2.3);
-    pins.append("title").text((s) => pick(s.name, document.documentElement.dataset.lang));
+    const MERGE_PX = 16;
+    const markers = g.append("g").attr("class", "pins");
+    const kindOf = (list) => (list.every((s) => s.type === "gym") ? "gym" : list.every((s) => s.type !== "gym") ? "outdoor" : "mixed");
+    const activate = (e, m) => (m.spots.length > 1 ? openCluster(m.spots) : openSpot(m.spots[0]));
+
+    function drawMarkers(k) {
+      const groups = [];
+      for (const s of SPOTS) {
+        const near = groups.find((c) => Math.hypot((c.x - s.x) * k, (c.y - s.y) * k) < MERGE_PX);
+        if (near) {
+          near.spots.push(s);
+          near.x = d3.mean(near.spots, (p) => p.x);
+          near.y = d3.mean(near.spots, (p) => p.y);
+        } else groups.push({ x: s.x, y: s.y, spots: [s] });
+      }
+      groups.forEach((m) => { m.key = m.spots.map((s) => SPOTS.indexOf(s)).join("-"); });
+      groups.sort((a, b) => a.y - b.y);
+
+      markers.selectAll("g.marker").data(groups, (m) => m.key).join(
+        (enter) => {
+          const el = enter.append("g")
+            .attr("tabindex", 0)
+            .attr("role", "button")
+            .on("click", activate)
+            .on("keydown", (e, m) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(e, m); } });
+          el.each(function (m) {
+            const node = d3.select(this);
+            if (m.spots.length === 1) {
+              const s = m.spots[0];
+              node.attr("class", `marker pin pin-${s.type === "gym" ? "gym" : "outdoor"}`).attr("aria-label", pick(s.name, "en"));
+              node.append("path").attr("d", PIN);
+              node.append("circle").attr("cy", -11.5).attr("r", 2.3);
+              node.append("title").text(pick(s.name, "en"));
+            } else {
+              node.attr("class", `marker cluster cluster-${kindOf(m.spots)}`)
+                .attr("aria-label", m.spots.map((s) => pick(s.name, "en")).join(", "));
+              node.append("circle").attr("r", 9.5);
+              node.append("text").attr("dy", "0.35em").text(m.spots.length);
+              node.append("title").text(m.spots.map((s) => pick(s.name, "en")).join("\n"));
+            }
+          });
+          return el;
+        }
+      ).attr("transform", (m) => `translate(${m.x},${m.y}) scale(${1 / k})`);
+    }
 
     // 缩放 / 拖动：滚轮需要按住 Ctrl（或 ⌘），免得滚页面时误缩放
     const zoom = d3.zoom()
-      .scaleExtent([1, 20])
+      .scaleExtent([1, 60])
       .translateExtent([[0, 0], [W, H]])
       .filter((e) => (e.type === "wheel" ? e.ctrlKey || e.metaKey : !e.button))
       .on("zoom", (e) => {
         g.attr("transform", e.transform);
-        pins.attr("transform", (s) => `translate(${s.x},${s.y}) scale(${1 / Math.sqrt(e.transform.k)})`);
+        drawMarkers(e.transform.k);
       });
     svg.call(zoom).on("dblclick.zoom", null);
+    drawMarkers(1);
 
     box.insertAdjacentHTML("beforeend", `
       <div class="map-ctrl">
@@ -156,12 +191,13 @@
          <span lang="zh">${visited.size} 个国家 · ${n("outdoor")} 个户外岩场 · ${n("gym")} 个岩馆</span>`
       : `<span lang="en">No pins yet.</span><span lang="zh">还没有钉子。</span>`;
 
-    const byDate = [...SPOTS].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+    // Home gym 排最前，其余按日期从新到旧
+    const byDate = [...SPOTS].sort((a, b) => (b.home ? 1 : 0) - (a.home ? 1 : 0) || String(b.date || "").localeCompare(String(a.date || "")));
     listEl.innerHTML = byDate.map((s, i) => `
       <li><button type="button" data-i="${SPOTS.indexOf(s)}">
         <span class="cl-dot cl-${s.type === "gym" ? "gym" : "outdoor"}" aria-hidden="true"></span>
         <span class="cl-name">${bi(s.name)}</span>
-        <span class="cl-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${s.country ? " · " + esc(s.country.properties.name) : ""}${s.date ? " · " + esc(s.date) : ""}</span>
+        <span class="cl-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${s.country ? " · " + esc(s.country.properties.name) : ""}${when(s)}</span>
       </button></li>`).join("");
     listEl.addEventListener("click", (e) => {
       const b = e.target.closest("button[data-i]");
@@ -185,35 +221,36 @@
     const media = s.media || [];
     dialog.innerHTML = `
       <button type="button" class="spot-close" aria-label="Close">✕</button>
-      <p class="spot-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${s.country ? " · " + esc(s.country.properties.name) : ""}${s.date ? " · " + esc(s.date) : ""}</p>
+      <p class="spot-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${s.country ? " · " + esc(s.country.properties.name) : ""}${when(s)}</p>
       <h3>${bi(s.name)}</h3>
       ${s.note ? `<p class="spot-note">${bi(s.note)}</p>` : ""}
       ${media.length
         ? `<div class="spot-media">${media.map(mediaHTML).join("")}</div>`
         : `<p class="spot-empty"><span lang="en">No photos yet.</span><span lang="zh">还没有照片。</span></p>`}`;
     dialog.querySelector(".spot-close").addEventListener("click", () => dialog.close());
-    dialog.showModal();
+    if (!dialog.open) dialog.showModal();
+  }
+
+  // 几个钉子叠在一起时：先列出这几个地方，再选一个打开
+  function openCluster(list) {
+    dialog.innerHTML = `
+      <button type="button" class="spot-close" aria-label="Close">✕</button>
+      <p class="spot-meta">${list.length} <span lang="en">places here</span><span lang="zh">个地方</span></p>
+      <ul class="cluster-list">${list.map((s, i) => `
+        <li><button type="button" data-i="${i}">
+          <span class="cl-dot cl-${s.type === "gym" ? "gym" : "outdoor"}" aria-hidden="true"></span>
+          <span class="cl-name">${bi(s.name)}</span>
+          <span class="cl-meta">${bi(TYPE[s.type] || TYPE.outdoor)}${when(s)}</span>
+        </button></li>`).join("")}</ul>`;
+    dialog.querySelector(".spot-close").addEventListener("click", () => dialog.close());
+    dialog.querySelector(".cluster-list").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-i]");
+      if (b) openSpot(list[+b.dataset.i]);
+    });
+    if (!dialog.open) dialog.showModal();
   }
   // 点弹窗外面关闭；关闭时停掉视频
   dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
   dialog.addEventListener("close", () => { dialog.innerHTML = ""; });
 
-  /* ---------- 示例地点（网址加 ?demo 才会出现） ---------- */
-  function demoSpots() {
-    const ph = (label, bg) => ({
-      type: "image",
-      src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500"><rect width="800" height="500" fill="${bg}"/><text x="400" y="260" font-family="sans-serif" font-size="28" fill="#fff" text-anchor="middle">${label}</text></svg>`),
-      caption: { en: `Demo photo — ${label}`, zh: `示例照片 — ${label}` },
-    });
-    return [
-      { name: { en: "Fontainebleau", zh: "枫丹白露" }, type: "outdoor", lat: 48.404, lng: 2.699, date: "2026-05",
-        note: { en: "Demo note: a line or two about the trip.", zh: "示例：一两句关于这次攀岩的话。" },
-        media: [ph("Photo 1", "#8a9a7b"), ph("Photo 2", "#b08968")] },
-      { name: { en: "Yosemite", zh: "优胜美地" }, type: "outdoor", lat: 37.73, lng: -119.6, date: "2025-09" },
-      { name: { en: "Yangshuo", zh: "阳朔" }, type: "outdoor", lat: 24.78, lng: 110.49, date: "2025-12" },
-      { name: { en: "Railay", zh: "莱利海滩" }, type: "outdoor", lat: 8.01, lng: 98.84, date: "2026-02" },
-      { name: { en: "A gym in Shanghai", zh: "上海某岩馆" }, type: "gym", lat: 31.23, lng: 121.47, date: "2026-08" },
-      { name: { en: "A gym in New York", zh: "纽约某岩馆" }, type: "gym", lat: 40.71, lng: -74.0, date: "2026-07" },
-    ];
-  }
 })();

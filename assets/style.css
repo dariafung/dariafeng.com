@@ -166,6 +166,20 @@ body.on-dark .top { color: #f3f1ea; }
 .pin-outdoor path { fill: var(--outdoor); }
 .pin-gym path { fill: var(--gym); }
 .pin:hover path, .pin:focus-visible path { transform: scale(1.3); transform-origin: 0 0; }
+.cluster { cursor: pointer; outline: none; }
+.cluster circle { stroke: #fff; stroke-width: 1.5; transition: transform .2s; }
+.cluster text { fill: #fff; font-size: 10px; font-weight: 600; text-anchor: middle; pointer-events: none; }
+.cluster-gym circle { fill: var(--gym); }
+.cluster-outdoor circle { fill: var(--outdoor); }
+.cluster-mixed circle { fill: #555; }
+.cluster:hover circle, .cluster:focus-visible circle { transform: scale(1.2); }
+.cluster-list { list-style: none; margin-top: 12px; border-top: 1px solid #eee; }
+.cluster-list button {
+  width: 100%; text-align: left;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid #eee;
+}
+.cluster-list button:hover .cl-name { text-decoration: underline; text-underline-offset: 3px; }
 .map-ctrl { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
 .map-ctrl button {
   width: 30px; height: 30px; border-radius: 6px;
