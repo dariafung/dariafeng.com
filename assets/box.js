@@ -3,11 +3,9 @@
    重量感来自运动：推得动但很慢、转起来停不下、最后“落”在一个面上
    ========================================================== */
 import * as THREE from "three";
-import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
 /* ---------- 可调参数 ---------- */
 const SIZE = 1.0;         // 边长
-const BEVEL = 0.03;       // 倒角半径：边缘接光，显得是实心的一块
 const COLOR = "#030303";  // 方块颜色
 
 const DRAG_GAIN = 0.006;  // 拖动 1px 对应的转速
@@ -125,7 +123,7 @@ function init() {
   grainTex.wrapS = grainTex.wrapT = THREE.RepeatWrapping;
 
   const cube = new THREE.Mesh(
-    new RoundedBoxGeometry(SIZE, SIZE, SIZE, 8, BEVEL),
+    new THREE.BoxGeometry(SIZE, SIZE, SIZE), // 直角直边
     new THREE.MeshPhysicalMaterial({
       color: COLOR,
       roughness: 0.7,
