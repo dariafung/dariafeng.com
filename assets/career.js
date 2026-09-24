@@ -3,7 +3,9 @@
    文字可以直接写一种语言（"MLE Intern"），也可以写中英两份（{ en: "…", zh: "…" }）
 
    education / internships：
-     logo:    大 logo。{ img: "图片路径" } 用原图；{ icon: "图标名", color: "#色值" } 用 Simple Icons 的单色图标
+     logo:    大 logo。{ img: "图片路径" } 用原图；
+              { icon: "图标名", color: "#色值" } 用 Simple Icons 的单色图标；
+              { mask: "单色 SVG 路径", color: "#色值" } 把自己的单色 SVG 涂成指定颜色
      name:    logo 旁边的名字
      sub:     logo 下面的小 logo（可选），格式同上，加 label 写名字
      title:   卡片上的主要文字，比如学位 / 职位
@@ -17,7 +19,8 @@ const SI = (name) => `https://cdn.jsdelivr.net/npm/simple-icons@13/icons/${name}
 window.CAREER = {
   education: [
     {
-      logo: null, // 等 UW 官方 crest 下载好后放在 assets/logos/ 里
+      // UW 官方单色 crest（brand.wisc.edu），涂成 UW 红
+      logo: { mask: "assets/logos/uw-crest.svg", color: "#c5050c" },
       name: "University of Wisconsin–Madison",
       title: "B.S. in Computer Science",
     },
@@ -53,7 +56,9 @@ window.CAREER = {
   const logoHTML = (l, cls) => {
     if (!l) return "";
     if (l.img) return `<img class="${cls}" src="${esc(l.img)}" alt="">`;
-    return `<span class="${cls} mask-icon" style="--icon: url('${SI(l.icon)}'); --c: ${esc(l.color || "#111")}" aria-hidden="true"></span>`;
+    // 转成完整地址：写在 CSS 变量里的相对路径会被当成相对样式表，找错地方
+    const url = l.mask ? new URL(l.mask, document.baseURI).href : SI(l.icon);
+    return `<span class="${cls} mask-icon" style="--icon: url('${esc(url)}'); --c: ${esc(l.color || "#111")}" aria-hidden="true"></span>`;
   };
 
   const orgCard = (c) => `
