@@ -136,7 +136,7 @@ body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
 .page ul { padding-left: 1.2em; }
 
 /* Climbing 页：全宽，和顶部 Logo 对齐 */
-.page-wide { max-width: none; padding-left: clamp(16px, 4vw, 40px); padding-right: clamp(16px, 4vw, 40px); }
+.page-wide { max-width: none; padding-top: 68px; padding-left: clamp(16px, 4vw, 40px); padding-right: clamp(16px, 4vw, 40px); } /* 顶部只留出 header 的高度 */
 
 /* ---------- Climbing 地图 ---------- */
 /* 钉子：户外 = 暖黄，岩馆 = 钴蓝
@@ -149,7 +149,7 @@ body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
 .climb-map {
   position: relative;
   /* 尽量大：宽度占满，高度不超过一屏 */
-  height: min(calc((100vw - 80px) / 2), calc(100svh - 170px));
+  height: min(calc((100vw - 80px) / 2), calc(100svh - 130px));
   min-height: 280px;
   background: #fafafa;
   border: 1px solid #eee; border-radius: 8px;
@@ -239,6 +239,7 @@ body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
   .blog-panel { top: auto; height: 55%; width: 100%; padding: 24px 20px; background: #0a0a0a; border-top: 1px solid rgba(255,255,255,.12); transform: translateY(100%); }
   .blog-panel.is-open { transform: none; }
   .climb-map { height: auto; min-height: 0; aspect-ratio: 2 / 1; }
+  .page-wide { padding-top: 100px; } /* 手机上 header 有两行 */
   /* 攀岩列表：地点信息换到名字下面 */
   .climb-list button { grid-template-columns: auto 1fr; row-gap: 2px; }
   .cl-meta { grid-column: 2; }
