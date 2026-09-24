@@ -32,6 +32,8 @@ html[data-lang="zh"] .lang-toggle [data-l="zh"] { opacity: 1; font-weight: 600; 
 
 /* 首页和 Blog：header 叠在深色背景上，文字变白 */
 body.on-dark .top { color: #f3f1ea; }
+/* 首页是亮的蓝天白云，白字加一层淡阴影，飘过白云时也看得清 */
+body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
 
 /* ---------- Tabs ---------- */
 .tab { display: none; }
@@ -42,7 +44,7 @@ body.on-dark .top { color: #f3f1ea; }
   position: relative;
   height: 100vh; height: 100svh;
   overflow: hidden;
-  background: #10243f;
+  background: #4a88d0;
   color: #f3f1ea;
 }
 #stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }

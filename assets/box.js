@@ -57,21 +57,23 @@ function init() {
         vec2 p = uv * vec2(uRes.x / uRes.y, 1.0);
         float t = uTime * 0.012;
 
-        vec3 deep = vec3(0.035, 0.09, 0.19);
-        vec3 high = vec3(0.10, 0.20, 0.36);
-        vec3 sky = mix(deep, high, smoothstep(0.0, 1.0, uv.y + 0.15 * uv.x));
+        // 白天的蓝天：头顶是饱和的蓝，越往下越浅
+        vec3 zenith  = vec3(0.13, 0.42, 0.82);
+        vec3 horizon = vec3(0.62, 0.81, 0.96);
+        vec3 sky = mix(horizon, zenith, smoothstep(0.0, 1.0, uv.y * 1.1 + 0.08 * uv.x));
 
         float c1 = fbm(p * 1.3 + vec2(t, t * 0.3));
         float c2 = fbm(p * 2.6 + vec2(t * 1.8, -t * 0.4) + c1);
-        float clouds = smoothstep(0.48, 0.85, c1 * 0.6 + c2 * 0.55);
-        float wisps  = smoothstep(0.55, 0.95, c2) * 0.35;
-        vec3 cloudCol = mix(vec3(0.42, 0.50, 0.62), vec3(0.78, 0.82, 0.88), c2);
-        sky = mix(sky, cloudCol, clouds * 0.75 + wisps);
+        // 白云：中间亮白，边缘和底部带一点灰蓝的阴影
+        float clouds = smoothstep(0.50, 0.82, c1 * 0.6 + c2 * 0.55);
+        float wisps  = smoothstep(0.58, 0.95, c2) * 0.25;
+        vec3 cloudCol = mix(vec3(0.78, 0.84, 0.92), vec3(1.0), smoothstep(0.35, 0.8, c2));
+        sky = mix(sky, cloudCol, clouds * 0.92 + wisps);
 
         float vig = smoothstep(1.25, 0.35, length(uv - 0.5));
-        sky *= mix(0.72, 1.0, vig);
+        sky *= mix(0.88, 1.0, vig);
 
-        sky += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.025;
+        sky += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.015;
         gl_FragColor = vec4(sky, 1.0);
       }`,
     depthWrite: false,
@@ -88,7 +90,7 @@ function init() {
   const envGeo = new THREE.SphereGeometry(10, 64, 32);
   const envCols = [];
   const pos = envGeo.attributes.position;
-  const top = new THREE.Color("#b9c8de"), mid = new THREE.Color("#2b4466"), bot = new THREE.Color("#000000");
+  const top = new THREE.Color("#cfe2f7"), mid = new THREE.Color("#4f86c6"), bot = new THREE.Color("#000000");
   for (let i = 0; i < pos.count; i++) {
     const h = pos.getY(i) / 10; // -1 … 1
     const c = h > 0 ? mid.clone().lerp(top, Math.pow(h, 0.7)) : mid.clone().lerp(bot, Math.min(1, -h * 3));
