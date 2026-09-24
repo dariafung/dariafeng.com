@@ -136,24 +136,56 @@
       .attr("class", (f) => (visitedRegions.has(f) ? "region is-visited" : "region"))
       .append("title").text((f) => f.properties.name);
 
-    // 钉子：尖端正好落在坐标上。离得太近（在当前缩放下重叠）的钉子合成一个带数字的圆点
+    // 钉子：尖端落在坐标上
+    // - 只有同一个州/省（没有州/省数据时同一个国家）里、且在当前缩放下重叠的钉子才合并，合并后还是钉子形状，头里写数字
+    // - 不同州/省的钉子如果挨得太近，会互相推开一点，保证不重叠（位置不必精确）
     const PIN = "M0,0 C-2.4,-4.2 -6,-7.4 -6,-11.5 A6,6 0 1 1 6,-11.5 C6,-7.4 2.4,-4.2 0,0 Z";
-    const MERGE_PX = 16;
+    const MERGE_PX = 16;   // 同一州/省内，距离小于这个就合并
+    const APART_PX = 22;   // 不同钉子之间至少保持的距离
     const markers = g.append("g").attr("class", "pins");
     const kindOf = (list) => (list.every((s) => s.type === "gym") ? "gym" : list.every((s) => s.type !== "gym") ? "outdoor" : "mixed");
+    const areaKey = (s) => (s.region ? "r:" + s.region.properties.name : s.country ? "c:" + s.country.properties.name : "p:" + SPOTS.indexOf(s));
     const activate = (e, m) => (m.spots.length > 1 ? openCluster(m.spots) : openSpot(m.spots[0]));
 
+    // 一半黄一半蓝，给同时有户外和岩馆的合并钉子用
+    svg.append("defs").html(`
+      <linearGradient id="pinMixed" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="50%" style="stop-color: var(--outdoor)"/><stop offset="50%" style="stop-color: var(--gym)"/>
+      </linearGradient>`);
+
     function drawMarkers(k) {
+      // 1) 在同一个州/省里合并重叠的钉子
       const groups = [];
       for (const s of SPOTS) {
-        const near = groups.find((c) => Math.hypot((c.x - s.x) * k, (c.y - s.y) * k) < MERGE_PX);
+        const key = areaKey(s);
+        const near = groups.find((c) => c.area === key && Math.hypot((c.ax - s.x) * k, (c.ay - s.y) * k) < MERGE_PX);
         if (near) {
           near.spots.push(s);
-          near.x = d3.mean(near.spots, (p) => p.x);
-          near.y = d3.mean(near.spots, (p) => p.y);
-        } else groups.push({ x: s.x, y: s.y, spots: [s] });
+          near.ax = d3.mean(near.spots, (p) => p.x);
+          near.ay = d3.mean(near.spots, (p) => p.y);
+        } else groups.push({ area: key, ax: s.x, ay: s.y, spots: [s] });
       }
-      groups.forEach((m) => { m.key = m.spots.map((s) => SPOTS.indexOf(s)).join("-"); });
+
+      // 2) 在屏幕坐标里把挨得太近的钉子推开，同时轻轻拉回原位
+      groups.forEach((m) => { m.sx = m.ax * k; m.sy = m.ay * k; });
+      for (let it = 0; it < 40; it++) {
+        for (let i = 0; i < groups.length; i++) {
+          for (let j = i + 1; j < groups.length; j++) {
+            const a = groups[i], b = groups[j];
+            let dx = b.sx - a.sx, dy = b.sy - a.sy, d = Math.hypot(dx, dy);
+            if (d >= APART_PX) continue;
+            if (d < 1e-3) { dx = 1; dy = 0; d = 1; }
+            const push = (APART_PX - d) / 2;
+            a.sx -= (dx / d) * push; a.sy -= (dy / d) * push;
+            b.sx += (dx / d) * push; b.sy += (dy / d) * push;
+          }
+        }
+        groups.forEach((m) => { m.sx += (m.ax * k - m.sx) * 0.05; m.sy += (m.ay * k - m.sy) * 0.05; });
+      }
+      groups.forEach((m) => {
+        m.x = m.sx / k; m.y = m.sy / k;
+        m.key = m.spots.map((s) => SPOTS.indexOf(s)).join("-");
+      });
       groups.sort((a, b) => a.y - b.y);
 
       markers.selectAll("g.marker").data(groups, (m) => m.key).join(
@@ -165,19 +197,14 @@
             .on("keydown", (e, m) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(e, m); } });
           el.each(function (m) {
             const node = d3.select(this);
-            if (m.spots.length === 1) {
-              const s = m.spots[0];
-              node.attr("class", `marker pin pin-${s.type === "gym" ? "gym" : "outdoor"}`).attr("aria-label", pick(s.name, "en"));
-              node.append("path").attr("d", PIN);
-              node.append("circle").attr("cy", -11.5).attr("r", 2.3);
-              node.append("title").text(pick(s.name, "en"));
-            } else {
-              node.attr("class", `marker cluster cluster-${kindOf(m.spots)}`)
-                .attr("aria-label", m.spots.map((s) => pick(s.name, "en")).join(", "));
-              node.append("circle").attr("r", 9.5);
-              node.append("text").attr("dy", "0.35em").text(m.spots.length);
-              node.append("title").text(m.spots.map((s) => pick(s.name, "en")).join("\n"));
-            }
+            const names = m.spots.map((s) => pick(s.name, "en"));
+            node.attr("class", `marker pin pin-${kindOf(m.spots)}${m.spots.length > 1 ? " pin-multi" : ""}`)
+              .attr("aria-label", names.join(", "));
+            const body = node.append("g").attr("class", "pin-body");
+            body.append("path").attr("d", PIN);
+            if (m.spots.length === 1) body.append("circle").attr("cy", -11.5).attr("r", 2.3);
+            else body.append("text").attr("y", -11.5).attr("dy", "0.36em").text(m.spots.length);
+            node.append("title").text(names.join("\n"));
           });
           return el;
         }

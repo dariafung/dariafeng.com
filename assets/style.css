@@ -158,18 +158,17 @@ body.on-dark .top { color: #f3f1ea; }
 .region { fill: none; stroke: #fff; stroke-width: .35; vector-effect: non-scaling-stroke; }
 .region.is-visited { fill: var(--visited); }
 .pin { cursor: pointer; outline: none; }
-.pin path { stroke: rgba(0,0,0,.28); stroke-width: 1; vector-effect: non-scaling-stroke; transition: transform .2s; }
+.pin path { stroke: rgba(0,0,0,.28); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .pin circle { fill: #fff; }
 .pin-outdoor path { fill: var(--outdoor); }
 .pin-gym path { fill: var(--gym); }
-.pin:hover path, .pin:focus-visible path { transform: scale(1.3); transform-origin: 0 0; }
-.cluster { cursor: pointer; outline: none; }
-.cluster circle { stroke: rgba(0,0,0,.28); stroke-width: 1; transition: transform .2s; }
-.cluster text { fill: #fff; font-size: 10px; font-weight: 600; text-anchor: middle; pointer-events: none; }
-.cluster-gym circle { fill: var(--gym); }
-.cluster-outdoor circle { fill: var(--outdoor); }
-.cluster-mixed circle { fill: #4a4a4a; }
-.cluster:hover circle, .cluster:focus-visible circle { transform: scale(1.2); }
+.pin-mixed path { fill: url(#pinMixed); }
+.pin-body { transition: transform .2s; }
+.pin-multi .pin-body { transform: scale(1.35); }   /* 合并的钉子大一点，头里放数字 */
+.pin text { font-size: 7.5px; font-weight: 700; text-anchor: middle; fill: #fff; pointer-events: none; }
+.pin-outdoor text { fill: #3d2a00; }                /* 黄底用深色字，看得清 */
+.pin:hover .pin-body, .pin:focus-visible .pin-body { transform: scale(1.3); }
+.pin-multi:hover .pin-body, .pin-multi:focus-visible .pin-body { transform: scale(1.6); }
 .cluster-list { list-style: none; margin-top: 12px; border-top: 1px solid #eee; }
 .cluster-list button {
   width: 100%; text-align: left;
