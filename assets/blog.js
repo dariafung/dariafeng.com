@@ -4,7 +4,6 @@
    - 每篇文章在它的每个 tag 旁边各有一个无字小点
    - 同一个 tag 的文章点互相连线，也连到 tag 节点
    网址：#blog  /  #blog/tag/tech  /  #blog/post/<slug>
-   在网址后加 ?demo 可以用假文章预览效果
    ========================================================== */
 (function () {
   const TAGS = [
@@ -22,8 +21,7 @@
   const postEl = document.getElementById("blogPost");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  let POSTS = window.POSTS || [];
-  if (new URLSearchParams(location.search).has("demo")) POSTS = demoPosts();
+  const POSTS = window.POSTS || [];
 
   /* ---------- 小工具 ---------- */
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -318,15 +316,4 @@
   });
   route();
 
-  /* ---------- 演示用的假文章（网址加 ?demo 才会出现） ---------- */
-  function demoPosts() {
-    const combos = [["notes"], ["scifi"], ["tech"], ["notes", "tech"], ["scifi", "tech"], ["notes"], ["tech"], ["scifi"], ["notes", "scifi", "tech"], ["notes"], ["tech"]];
-    return combos.map((tags, i) => ({
-      slug: `demo-${i + 1}`,
-      date: `2026-09-${String(20 - i).padStart(2, "0")}`,
-      tags,
-      title: { en: `Demo post ${i + 1}`, zh: `示例文章 ${i + 1}` },
-      body: { en: "<p>…</p>", zh: "<p>……</p>" },
-    }));
-  }
 })();

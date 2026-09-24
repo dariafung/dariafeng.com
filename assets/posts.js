@@ -17,4 +17,14 @@
    ========================================================== */
 
 window.POSTS = [
+  {
+    slug: "memo1",
+    date: "2026-09-24",
+    tags: ["notes"],
+    title: { en: "memo1", zh: "memo1" },
+    body: {
+      en: "<p>Often, we hesitate between choices because we don't know ourselves well enough. Once we truly understand ourselves, we realize there is only one path left.</p>",
+      zh: "<p>很多时候在不同选择中犹豫不决是因为不够了解自己，真正了解自己之后意识到其实只剩下一条路。</p>",
+    },
+  },
 ];
