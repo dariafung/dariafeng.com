@@ -138,6 +138,54 @@ body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
 /* Climbing 页：全宽，和顶部 Logo 对齐 */
 .page-wide { max-width: none; padding-top: 68px; padding-left: clamp(16px, 4vw, 40px); padding-right: clamp(16px, 4vw, 40px); } /* 顶部只留出 header 的高度 */
 
+/* ---------- Career：卡片 ---------- */
+.career h2 { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; margin: 32px 0 12px; }
+.career h2:first-of-type { margin-top: 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+/* 翻转卡片 */
+.flip-card { display: block; width: 100%; height: 220px; padding: 0; text-align: left; perspective: 1200px; }
+.flip-inner {
+  position: relative; display: block; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .7s cubic-bezier(.2, .8, .2, 1);
+}
+.flip-card.is-flipped .flip-inner { transform: rotateY(180deg); }
+.face {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 22px;
+  border: 1px solid #e5e5e5; border-radius: 14px;
+  background: #fff;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+.face.back { transform: rotateY(180deg); background: #111; color: #f3f1ea; border-color: #111; }
+.flip-card:hover .face.front, .flip-card:focus-visible .face.front { border-color: #bbb; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
+.fc-title { font-size: 20px; font-weight: 600; line-height: 1.3; }
+.fc-sub { color: #555; }
+.fc-when { margin-top: auto; font-size: 13px; color: #999; }
+.fc-details { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; font-size: 14px; line-height: 1.5; overflow: auto; }
+.fc-li::before { content: "— "; opacity: .5; }
+.fc-hint { position: absolute; right: 18px; bottom: 16px; font-size: 16px; opacity: .35; }
+
+/* 项目卡片 */
+.project-card {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  min-height: 160px; padding: 22px;
+  border: 1px solid #e5e5e5; border-radius: 14px;
+  text-decoration: none;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+a.project-card:hover { border-color: #bbb; box-shadow: 0 6px 24px rgba(0,0,0,.06); transform: translateY(-2px); }
+.project-card.is-disabled { color: #999; }
+.pc-title { font-size: 18px; font-weight: 600; }
+.pc-desc { color: #666; font-size: 14px; }
+.pc-arrow { position: absolute; top: 18px; right: 20px; font-size: 18px; transition: transform .2s; }
+a.project-card:hover .pc-arrow { transform: translate(2px, -2px); }
+
+@media (prefers-reduced-motion: reduce) { .flip-inner { transition: none; } }
+
 /* ---------- Climbing 地图 ---------- */
 /* 钉子：户外 = 暖黄，岩馆 = 钴蓝
    涂色：用同色系的浅色，钉子放上去还看得清；两种都有 = 浅绿（黄 + 蓝） */

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
   <!-- 每次更新网站时改一下 ?v= 后面的版本号，访客就会拿到新文件，不会用缓存里的旧版 -->
-  <link rel="stylesheet" href="assets/style.css?v=20260923p">
+  <link rel="stylesheet" href="assets/style.css?v=20260923q">
   <script type="importmap">
     { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
@@ -51,22 +51,18 @@
       <article id="blogPost" class="blog-post" hidden></article>
     </section>
 
-    <!-- ========== Career ========== -->
-    <section class="tab page" data-tab="career">
-      <h1><span lang="en">Career</span><span lang="zh">经历</span></h1>
+    <!-- ========== Career：内容在 assets/career.js ========== -->
+    <section class="tab page page-wide career" data-tab="career">
+      <h1 class="sr-only"><span lang="en">Career</span><span lang="zh">经历</span></h1>
 
       <h2><span lang="en">Education</span><span lang="zh">教育</span></h2>
-      <ul>
-        <li>…</li>
-      </ul>
+      <div class="cards" id="eduCards"></div>
 
       <h2><span lang="en">Internships</span><span lang="zh">实习</span></h2>
-      <ul>
-        <li>…</li>
-      </ul>
+      <div class="cards" id="internCards"></div>
 
-      <h2><span lang="en">Skills</span><span lang="zh">技能</span></h2>
-      <p>…</p>
+      <h2><span lang="en">Projects</span><span lang="zh">项目</span></h2>
+      <div class="cards" id="projectCards"></div>
     </section>
 
     <!-- ========== Climbing ========== -->
@@ -97,11 +93,12 @@
     </section>
   </main>
 
-  <script src="assets/posts.js?v=20260923p"></script>
-  <script src="assets/main.js?v=20260923p"></script>
-  <script src="assets/blog.js?v=20260923p"></script>
-  <script src="assets/climbing.js?v=20260923p"></script>
-  <script src="assets/map.js?v=20260923p"></script>
-  <script type="module" src="assets/box.js?v=20260923p"></script>
+  <script src="assets/posts.js?v=20260923q"></script>
+  <script src="assets/main.js?v=20260923q"></script>
+  <script src="assets/blog.js?v=20260923q"></script>
+  <script src="assets/career.js?v=20260923q"></script>
+  <script src="assets/climbing.js?v=20260923q"></script>
+  <script src="assets/map.js?v=20260923q"></script>
+  <script type="module" src="assets/box.js?v=20260923q"></script>
 </body>
 </html>
