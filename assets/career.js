@@ -1,20 +1,35 @@
 /* ==========================================================
    Career 页面的内容都在这里改。
-   文字可以直接写一种语言（"UW–Madison"），也可以写中英两份（{ en: "…", zh: "…" }）
+   文字可以直接写一种语言（"MLE Intern"），也可以写中英两份（{ en: "…", zh: "…" }）
 
-   education / internships：翻转卡片
-     正面：title（学校 / 公司）、subtitle（学位 / 职位）、when（时间）
-     背面：details（几条要点）
+   education / internships：
+     logo:    大 logo。{ img: "图片路径" } 用原图；{ icon: "图标名", color: "#色值" } 用 Simple Icons 的单色图标
+     name:    logo 旁边的名字
+     sub:     logo 下面的小 logo（可选），格式同上，加 label 写名字
+     title:   卡片上的主要文字，比如学位 / 职位
+     when:    时间（可选）
    projects：点击打开 link（留空就不能点）
    ========================================================== */
 
+// Simple Icons：开源的品牌图标库，https://simpleicons.org
+const SI = (name) => `https://cdn.jsdelivr.net/npm/simple-icons@13/icons/${name}.svg`;
+
 window.CAREER = {
   education: [
-    { title: "…", subtitle: "…", when: "…", details: ["…"] },
+    {
+      logo: null, // 等 UW 官方 crest 下载好后放在 assets/logos/ 里
+      name: "University of Wisconsin–Madison",
+      title: "B.S. in Computer Science",
+    },
   ],
 
   internships: [
-    { title: "…", subtitle: "…", when: "…", details: ["…"] },
+    {
+      logo: { icon: "bytedance", color: "#3c8cff" },
+      name: "ByteDance",
+      sub: { icon: "tiktok", color: "#000000", label: "TikTok" },
+      title: "MLE Intern",
+    },
   ],
 
   projects: [
@@ -34,23 +49,23 @@ window.CAREER = {
     return `<span lang="en">${esc(pick(o, "en"))}</span><span lang="zh">${esc(pick(o, "zh"))}</span>`;
   };
 
-  // 翻转卡片：正面 + 背面，点击翻转
-  const flipCard = (c) => `
-    <button type="button" class="flip-card" aria-pressed="false">
-      <span class="flip-inner">
-        <span class="face front">
-          <span class="fc-title">${bi(c.title)}</span>
-          <span class="fc-sub">${bi(c.subtitle)}</span>
-          <span class="fc-when">${bi(c.when)}</span>
-          <span class="fc-hint" aria-hidden="true">↻</span>
-        </span>
-        <span class="face back">
-          <span class="fc-title">${bi(c.title)}</span>
-          <span class="fc-details">${(c.details || []).map((d) => `<span class="fc-li">${bi(d)}</span>`).join("")}</span>
-          <span class="fc-hint" aria-hidden="true">↻</span>
-        </span>
-      </span>
-    </button>`;
+  // 单色图标用 CSS mask 上色；原图直接用 <img>
+  const logoHTML = (l, cls) => {
+    if (!l) return "";
+    if (l.img) return `<img class="${cls}" src="${esc(l.img)}" alt="">`;
+    return `<span class="${cls} mask-icon" style="--icon: url('${SI(l.icon)}'); --c: ${esc(l.color || "#111")}" aria-hidden="true"></span>`;
+  };
+
+  const orgCard = (c) => `
+    <article class="org-card">
+      <div class="oc-head">
+        ${logoHTML(c.logo, "oc-logo")}
+        <span class="oc-name">${bi(c.name)}</span>
+      </div>
+      ${c.sub ? `<div class="oc-sub">${logoHTML(c.sub, "oc-sublogo")}<span>${bi(c.sub.label)}</span></div>` : ""}
+      <p class="oc-title">${bi(c.title)}</p>
+      ${c.when ? `<p class="oc-when">${bi(c.when)}</p>` : ""}
+    </article>`;
 
   // 项目卡片：有 link 就是可点击的链接
   const projectCard = (p) => {
@@ -63,14 +78,7 @@ window.CAREER = {
       : `<div class="project-card is-disabled">${inner}</div>`;
   };
 
-  document.getElementById("eduCards").innerHTML = (data.education || []).map(flipCard).join("");
-  document.getElementById("internCards").innerHTML = (data.internships || []).map(flipCard).join("");
+  document.getElementById("eduCards").innerHTML = (data.education || []).map(orgCard).join("");
+  document.getElementById("internCards").innerHTML = (data.internships || []).map(orgCard).join("");
   document.getElementById("projectCards").innerHTML = (data.projects || []).map(projectCard).join("");
-
-  document.querySelector('[data-tab="career"]').addEventListener("click", (e) => {
-    const card = e.target.closest(".flip-card");
-    if (!card) return;
-    const flipped = card.classList.toggle("is-flipped");
-    card.setAttribute("aria-pressed", String(flipped));
-  });
 })();

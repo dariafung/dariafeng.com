@@ -30,7 +30,7 @@ window.CLIMBS = [
   { name: "Boulders Climbing Gym", type: "gym", home: true, lat: 43.0728, lng: -89.3863 }, // Downtown：129 S Carroll St
 
   // ---- 北京 ----（位置是大概的，确认分店后再改）
-  { name: "Camp", type: "gym", date: "2026-07-19", lat: 39.9365, lng: 116.4540 },
+  { name: "CAMP4", type: "gym", date: "2026-07-19", lat: 39.9365, lng: 116.4540 },
   { name: "Bloc1", type: "gym", date: "2026-07-25", lat: 39.9150, lng: 116.4300 },
   { name: "岩时", type: "gym", date: "2026-08-08", lat: 39.8930, lng: 116.4760 },        // 大望路店：西大望路27号院
 
