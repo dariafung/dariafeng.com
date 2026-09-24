@@ -141,42 +141,32 @@ body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
 /* ---------- Career：卡片 ---------- */
 .career h2 { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; margin: 32px 0 12px; }
 .career h2:first-of-type { margin-top: 12px; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 
-/* 学校 / 公司卡片 */
+/* 学校 / 公司卡片：完整 logo，下面一行小字 */
 .org-card {
-  display: flex; flex-direction: column; gap: 10px;
-  min-height: 180px; padding: 24px;
-  border: 1px solid #e5e5e5; border-radius: 14px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  padding: 20px;
+  border: 1px solid #e5e5e5; border-radius: 12px;
 }
-.oc-head { display: flex; align-items: center; gap: 12px; }
-.oc-logo { width: 44px; height: 44px; flex: none; object-fit: contain; }
-.oc-name { font-size: 15px; font-weight: 600; line-height: 1.3; }
-.oc-sub { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555; }
-.oc-sublogo { width: 16px; height: 16px; flex: none; }
-.oc-title { margin-top: auto; font-size: 22px; font-weight: 600; line-height: 1.25; }
-.oc-when { font-size: 13px; color: #999; }
-/* 单色品牌图标：用 mask 把 SVG 形状涂成指定颜色 */
-.mask-icon {
-  display: inline-block;
-  background: var(--c);
-  -webkit-mask: var(--icon) center / contain no-repeat;
-          mask: var(--icon) center / contain no-repeat;
-}
+.oc-logo, .oc-sublogo { display: block; width: auto; max-width: 100%; }
+.oc-sublogo { margin-top: -4px; }
+.oc-title { font-size: 13px; color: #444; line-height: 1.4; }
+.oc-when { font-size: 12px; color: #999; }
 
 /* 项目卡片 */
 .project-card {
   position: relative; display: flex; flex-direction: column; gap: 6px;
-  min-height: 160px; padding: 22px;
-  border: 1px solid #e5e5e5; border-radius: 14px;
+  min-height: 120px; padding: 20px;
+  border: 1px solid #e5e5e5; border-radius: 12px;
   text-decoration: none;
   transition: border-color .2s, box-shadow .2s, transform .2s;
 }
 a.project-card:hover { border-color: #bbb; box-shadow: 0 6px 24px rgba(0,0,0,.06); transform: translateY(-2px); }
 .project-card.is-disabled { color: #999; }
-.pc-title { font-size: 18px; font-weight: 600; }
-.pc-desc { color: #666; font-size: 14px; }
-.pc-arrow { position: absolute; top: 18px; right: 20px; font-size: 18px; transition: transform .2s; }
+.pc-title { font-size: 14px; font-weight: 600; }
+.pc-desc { color: #666; font-size: 13px; }
+.pc-arrow { position: absolute; top: 16px; right: 18px; font-size: 15px; transition: transform .2s; }
 a.project-card:hover .pc-arrow { transform: translate(2px, -2px); }
 
 
