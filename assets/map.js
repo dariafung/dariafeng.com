@@ -116,6 +116,11 @@
     const filledCountries = new Set(SPOTS.filter((s) => s.country && !s.region).map((s) => s.country));
     // 有涂色州/省的国家，顺便画出它所有州/省的细边界
     const detailCountries = new Set([...visitedRegions].map((f) => f.properties.admin));
+    // 涂什么颜色：只爬过户外 = 黄，只去过岩馆 = 蓝，两种都有 = 绿
+    const fillClass = (area) => {
+      const types = new Set(SPOTS.filter((s) => (s.region || s.country) === area).map((s) => (s.type === "gym" ? "gym" : "outdoor")));
+      return types.size > 1 ? "is-both" : types.has("gym") ? "is-gym" : "is-outdoor";
+    };
 
     box.innerHTML = "";
     const svg = d3.select(box).append("svg")
@@ -127,13 +132,13 @@
     g.append("g").attr("class", "countries")
       .selectAll("path").data(countries).join("path")
       .attr("d", path)
-      .attr("class", (c) => (filledCountries.has(c) ? "country is-visited" : "country"))
+      .attr("class", (c) => (filledCountries.has(c) ? `country is-visited ${fillClass(c)}` : "country"))
       .append("title").text((c) => c.properties.name);
 
     g.append("g").attr("class", "regions")
       .selectAll("path").data(admin1.features.filter((f) => detailCountries.has(f.properties.admin))).join("path")
       .attr("d", path)
-      .attr("class", (f) => (visitedRegions.has(f) ? "region is-visited" : "region"))
+      .attr("class", (f) => (visitedRegions.has(f) ? `region is-visited ${fillClass(f)}` : "region"))
       .append("title").text((f) => f.properties.name);
 
     // 钉子：尖端落在坐标上

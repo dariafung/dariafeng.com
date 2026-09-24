@@ -137,8 +137,12 @@ body.on-dark .top { color: #f3f1ea; }
 .page-wide { max-width: none; padding-left: clamp(16px, 4vw, 40px); padding-right: clamp(16px, 4vw, 40px); }
 
 /* ---------- Climbing 地图 ---------- */
-/* 户外 = 暖黄，岩馆 = 钴蓝；涂色用淡蓝灰，和两种钉子都搭 */
-:root { --outdoor: #f2b134; --gym: #3a63d8; --visited: #a9bbe4; --land: #ececec; }
+/* 钉子：户外 = 暖黄，岩馆 = 钴蓝
+   涂色：用同色系的浅色，钉子放上去还看得清；两种都有 = 浅绿（黄 + 蓝） */
+:root {
+  --outdoor: #f2b134; --gym: #3a63d8; --land: #ececec;
+  --fill-outdoor: #f6d58e; --fill-gym: #afc0ec; --fill-both: #b4d6a4;
+}
 .climb-stats { color: #777; font-size: 14px; margin-bottom: 12px; }
 .climb-map {
   position: relative;
@@ -154,9 +158,10 @@ body.on-dark .top { color: #f3f1ea; }
 .climb-map svg:active { cursor: grabbing; }
 .map-msg { position: absolute; inset: 0; display: grid; place-items: center; color: #999; font-size: 14px; }
 .country { fill: var(--land); stroke: #fff; stroke-width: .5; vector-effect: non-scaling-stroke; }
-.country.is-visited { fill: var(--visited); }
+.country.is-outdoor, .region.is-outdoor { fill: var(--fill-outdoor); }
+.country.is-gym, .region.is-gym { fill: var(--fill-gym); }
+.country.is-both, .region.is-both { fill: var(--fill-both); }
 .region { fill: none; stroke: #fff; stroke-width: .35; vector-effect: non-scaling-stroke; }
-.region.is-visited { fill: var(--visited); }
 .pin { cursor: pointer; outline: none; }
 .pin path { stroke: rgba(0,0,0,.28); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .pin circle { fill: #fff; }
@@ -189,7 +194,11 @@ body.on-dark .top { color: #f3f1ea; }
 .cl-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .cl-outdoor { background: var(--outdoor); }
 .cl-gym { background: var(--gym); }
-.cl-swatch { display: inline-block; width: 14px; height: 10px; background: var(--visited); border-radius: 2px; }
+.cl-swatch { display: inline-block; width: 14px; height: 10px; border-radius: 2px; }
+.sw-outdoor { background: var(--fill-outdoor); }
+.sw-gym { background: var(--fill-gym); }
+.sw-both { background: var(--fill-both); }
+.legend-sep { width: 1px; height: 12px; background: #ddd; }
 
 .climb-details { margin-top: 24px; }
 .climb-details summary { cursor: pointer; font-size: 14px; color: #555; padding: 6px 0; }
