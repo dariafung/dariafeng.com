@@ -9,13 +9,13 @@
      when:   时间（可选）
    projects：点击打开 link（留空就不能点）
 
-   logo 来源：UW 官方 crest（brand.wisc.edu）；ByteDance、TikTok（Wikimedia）
+   logo 来源：UW 官方横版 W Crest（brand.wisc.edu）；ByteDance、TikTok（Wikimedia）
    ========================================================== */
 
 window.CAREER = {
   education: [
     {
-      logo: { img: "assets/logos/uw-crest.svg", h: 44, alt: "University of Wisconsin–Madison" },
+      logo: { img: "assets/logos/uw-horizontal.svg", h: 40, alt: "University of Wisconsin–Madison" },
       title: "B.S. in Computer Science",
     },
   ],
