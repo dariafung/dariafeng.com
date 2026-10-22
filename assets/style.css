@@ -138,21 +138,9 @@ body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
 /* Climbing 页：全宽，和顶部 Logo 对齐 */
 .page-wide { max-width: none; padding-top: 68px; padding-left: clamp(16px, 4vw, 40px); padding-right: clamp(16px, 4vw, 40px); } /* 顶部只留出 header 的高度 */
 
-/* ---------- Career：卡片 ---------- */
-.career h2 { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; margin: 32px 0 12px; }
-.career h2:first-of-type { margin-top: 12px; }
+/* ---------- Projects：卡片 ---------- */
+.projects .cards { margin-top: 12px; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-
-/* 学校 / 公司卡片：完整 logo，下面一行小字 */
-.org-card {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
-  padding: 20px;
-  border: 1px solid #e5e5e5; border-radius: 12px;
-}
-.oc-logo, .oc-sublogo { display: block; width: auto; max-width: 100%; }
-.oc-sublogo { margin-top: -4px; }
-.oc-title { font-size: 13px; color: #444; line-height: 1.4; }
-.oc-when { font-size: 12px; color: #999; }
 
 /* 项目卡片 */
 .project-card {
