@@ -196,7 +196,6 @@ a.theme-otf:hover .pc-play { background: #e13c35; }
   --outdoor: #f2b134; --gym: #3a63d8; --land: #ececec;
   --fill-outdoor: #f6d58e; --fill-gym: #afc0ec; --fill-both: #b4d6a4;
 }
-.climb-stats { color: #777; font-size: 14px; margin-top: 12px; }
 .climb-map {
   position: relative;
   /* 尽量大：宽度占满，高度不超过一屏 */
