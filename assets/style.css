@@ -138,21 +138,10 @@ body.on-dark .top, .home .hint { text-shadow: 0 1px 10px rgba(0, 30, 80, .35); }
 /* Climbing 页：全宽，和顶部 Logo 对齐 */
 .page-wide { max-width: none; padding-top: 68px; padding-left: clamp(16px, 4vw, 40px); padding-right: clamp(16px, 4vw, 40px); } /* 顶部只留出 header 的高度 */
 
-/* ---------- Career：卡片 ---------- */
-.career h2 { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; margin: 32px 0 12px; }
-.career h2:first-of-type { margin-top: 12px; }
+/* ---------- Projects：卡片 ---------- */
+.projects h2 { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; margin: 32px 0 12px; }
+.projects h2:first-child { margin-top: 12px; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-
-/* 学校 / 公司卡片：完整 logo，下面一行小字 */
-.org-card {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
-  padding: 20px;
-  border: 1px solid #e5e5e5; border-radius: 12px;
-}
-.oc-logo, .oc-sublogo { display: block; width: auto; max-width: 100%; }
-.oc-sublogo { margin-top: -4px; }
-.oc-title { font-size: 13px; color: #444; line-height: 1.4; }
-.oc-when { font-size: 12px; color: #999; }
 
 /* 项目卡片 */
 .project-card {
@@ -168,6 +157,36 @@ a.project-card:hover { border-color: #bbb; box-shadow: 0 6px 24px rgba(0,0,0,.06
 .pc-desc { color: #666; font-size: 13px; }
 .pc-arrow { position: absolute; top: 16px; right: 18px; font-size: 15px; transition: transform .2s; }
 a.project-card:hover .pc-arrow { transform: translate(2px, -2px); }
+
+/* 带封面的大卡片 */
+.project-card.has-cover { grid-column: span 2; padding: 0; gap: 0; overflow: hidden; }
+@media (max-width: 560px) { .project-card.has-cover { grid-column: auto; } }
+.pc-cover { display: block; aspect-ratio: 630 / 500; overflow: hidden; }
+.pc-cover img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .4s, filter .4s; }
+.pc-body { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px 20px; }
+.pc-tag { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #999; }
+.pc-play { align-self: flex-start; margin-top: 8px; font-size: 13px; font-weight: 600; }
+
+/* Outside The Frame：照游戏的配色——深褐窗框、米色招牌、红按钮、像素字 */
+.theme-otf {
+  --otf-dark: #100e0b; --otf-frame: #3a352b; --otf-paper: #efe6d2; --otf-line: #d4c4a0; --otf-red: #c8231c;
+  background: var(--otf-dark); color: var(--otf-paper);
+  border: 6px solid var(--otf-frame); border-radius: 4px;
+  box-shadow: inset 0 0 0 1px #5a5243;
+}
+.theme-otf .pc-cover { border-bottom: 6px solid var(--otf-frame); background: var(--otf-dark); }
+.theme-otf .pc-cover img { filter: brightness(.85) sepia(.15); }
+.theme-otf .pc-tag { font-family: "Silkscreen", monospace; color: var(--otf-line); opacity: .7; letter-spacing: .04em; text-transform: none; }
+.theme-otf .pc-title { font-family: "Silkscreen", monospace; font-weight: 400; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; color: var(--otf-paper); }
+.theme-otf .pc-desc { color: #b9ad94; }
+.theme-otf .pc-play {
+  font-family: "Silkscreen", monospace; font-weight: 400; text-transform: uppercase;
+  padding: 6px 12px; background: var(--otf-red); color: #fff; border-radius: 2px;
+  box-shadow: 0 2px 0 #7d1611;
+}
+a.theme-otf:hover { border-color: #4d463a; box-shadow: inset 0 0 0 1px #6b6250, 0 10px 30px rgba(16,14,11,.35); }
+a.theme-otf:hover .pc-cover img { filter: brightness(1.05) sepia(0); transform: scale(1.02); }
+a.theme-otf:hover .pc-play { background: #e13c35; }
 
 
 /* ---------- Climbing 地图 ---------- */

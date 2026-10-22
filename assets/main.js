@@ -16,12 +16,13 @@
   document.getElementById("langToggle").addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));
   setLang(lang);
 
-  /* ---------- Tab 切换（#home / #blog / #career / #climbing） ---------- */
+  /* ---------- Tab 切换（#home / #blog / #projects / #climbing） ---------- */
   const tabs = [...document.querySelectorAll("[data-tab]")];
   const names = tabs.map((t) => t.dataset.tab);
   function route() {
     let [name] = location.hash.slice(1).split("/");
     if (name === "sports") name = "climbing"; // 旧网址兼容
+    if (name === "career") name = "projects";
     const active = names.includes(name) ? name : "home";
     tabs.forEach((t) => t.classList.toggle("is-active", t.dataset.tab === active));
     document.querySelectorAll("[data-tab-link]").forEach((a) =>
