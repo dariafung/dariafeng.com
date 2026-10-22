@@ -15,7 +15,6 @@
 
   const panel = document.querySelector('[data-tab="climbing"]');
   const box = document.getElementById("climbMap");
-  const statsEl = document.getElementById("climbStats");
   const listEl = document.getElementById("climbList");
   const dialog = document.getElementById("spotDialog");
 
@@ -249,13 +248,7 @@
         .call(zoom.transform, d3.zoomIdentity.translate(W / 2 - s.x * k, H / 2 - s.y * k).scale(k));
     }
 
-    /* ---------- 统计 + 列表 ---------- */
-    const n = (t) => SPOTS.filter((s) => (t === "gym" ? s.type === "gym" : s.type !== "gym")).length;
-    const nc = visitedCountries.size, nr = visitedRegions.size;
-    statsEl.innerHTML = SPOTS.length
-      ? `<span lang="en">${nc} ${nc === 1 ? "country" : "countries"}${nr ? ` · ${nr} ${nr === 1 ? "state / province" : "states / provinces"}` : ""} · ${n("outdoor")} outdoor · ${n("gym")} ${n("gym") === 1 ? "gym" : "gyms"}</span>
-         <span lang="zh">${nc} 个国家${nr ? ` · ${nr} 个州 / 省` : ""} · ${n("outdoor")} 个户外岩场 · ${n("gym")} 个岩馆</span>`
-      : `<span lang="en">No pins yet.</span><span lang="zh">还没有钉子。</span>`;
+    /* ---------- 列表 ---------- */
     document.getElementById("climbCount").textContent = SPOTS.length;
 
     // Home gym 排最前，其余按日期从新到旧
