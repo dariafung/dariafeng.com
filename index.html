@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Silkscreen&display=swap" rel="stylesheet">
   <!-- 每次更新网站时改一下 ?v= 后面的版本号，访客就会拿到新文件，不会用缓存里的旧版 -->
-  <link rel="stylesheet" href="assets/style.css?v=20261021b">
+  <link rel="stylesheet" href="assets/style.css?v=20261021c">
   <script type="importmap">
     { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
@@ -60,12 +60,11 @@
     <!-- ========== Climbing ========== -->
     <section class="tab page page-wide" data-tab="climbing">
       <h1 class="sr-only"><span lang="en">Climbing</span><span lang="zh">攀岩</span></h1>
-      <p class="climb-stats" id="climbStats"></p>
-
       <!-- 世界地图：数据在 assets/climbing.js -->
       <div class="climb-map" id="climbMap">
         <p class="map-msg"><span lang="en">Loading map…</span><span lang="zh">地图加载中……</span></p>
       </div>
+      <p class="climb-stats" id="climbStats"></p>
       <div class="map-legend">
         <span><i class="cl-dot cl-outdoor"></i><span lang="en">Outdoor</span><span lang="zh">户外</span></span>
         <span><i class="cl-dot cl-gym"></i><span lang="en">Gym</span><span lang="zh">岩馆</span></span>
